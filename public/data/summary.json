@@ -1,0 +1,24 @@
+{
+  "n_runs": 8,
+  "total_duration_s": 8056.0,
+  "total_distance_m": 9871.8,
+  "total_size_gb": 60.8,
+  "streams": [
+    "RGB video",
+    "depth",
+    "spatial audio",
+    "VAM GPS",
+    "phone GPS",
+    "heading",
+    "IMU"
+  ],
+  "detection": {
+    "model": "YOLO11x",
+    "tracker": "BoT-SORT + ReID",
+    "classes": [
+      "pedestrians",
+      "bicycles",
+      "vehicles"
+    ]
+  }
+}

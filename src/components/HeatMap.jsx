@@ -1,0 +1,58 @@
+import { useEffect, useRef, useState } from 'react'
+import L from 'leaflet'
+import 'leaflet.heat'
+
+const CARTO = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+const GRADIENTS = {
+  ped: { 0.2: '#dbeafe', 0.5: '#60a5fa', 1.0: '#1d4ed8' },
+  veh: { 0.2: '#d1fae5', 0.5: '#34d399', 1.0: '#047857' },
+}
+
+export default function HeatMap({ run, heat }) {
+  const mapDiv = useRef(null)
+  const map = useRef(null)
+  const heatLayer = useRef(null)
+  const [cls, setCls] = useState('veh')
+
+  useEffect(() => {
+    const m = L.map(mapDiv.current, { zoomControl: true })
+    L.tileLayer(CARTO, { subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO' }).addTo(m)
+    const route = (run.phone.length ? run.phone : run.vam).map((p) => [p[0], p[1]])
+    if (route.length) {
+      L.polyline(route, { color: '#8a887f', weight: 1.5, opacity: 0.6 }).addTo(m)
+      m.fitBounds(route, { padding: [24, 24] })
+    }
+    map.current = m
+    return () => { m.remove(); map.current = null; heatLayer.current = null }
+  }, [run])
+
+  useEffect(() => {
+    const m = map.current
+    if (!m || !heat) return
+    if (heatLayer.current) { m.removeLayer(heatLayer.current); heatLayer.current = null }
+    const pts = heat[cls] || []
+    heatLayer.current = L.heatLayer(pts, {
+      radius: 20, blur: 16, max: 1.0, maxZoom: 18, minOpacity: 0.25, gradient: GRADIENTS[cls],
+    }).addTo(m)
+  }, [cls, heat])
+
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <h3>Observation density heatmap</h3>
+        <div className="seg" role="group" aria-label="Class">
+          <button className={cls === 'ped' ? 'on' : ''} onClick={() => setCls('ped')}>Pedestrians</button>
+          <button className={cls === 'veh' ? 'on' : ''} onClick={() => setCls('veh')}>Vehicles</button>
+        </div>
+      </div>
+      <div className="panel-body">
+        <div className="leaflet-holder"><div className="map" ref={mapDiv} style={{ minHeight: 380 }} /></div>
+        <div className="notice">
+          Intensity is the mean per-frame count of {cls === 'ped' ? 'pedestrians' : 'vehicles'} the
+          wearer observed while at each ~{heat?.bin_m ?? 11} m location (ego position, from YOLO
+          detections) — a proxy for how busy each area was, not the objects' own positions.
+        </div>
+      </div>
+    </div>
+  )
+}
