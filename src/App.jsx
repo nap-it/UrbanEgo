@@ -24,7 +24,7 @@ function Header() {
       <div className="banner" style={{ backgroundImage: `url(${asset('banner2.jpg')})` }}>
         <div className="banner-inner">
           <Link to="/" className="brand">
-            <h1>SafeXCity Dataset</h1>
+            <h1>UrbanEgo Dataset</h1>
           </Link>
           <div className="tagline">A wearable HoloLens&nbsp;2 dataset for vulnerable-road-user research in urban environments</div>
         </div>
@@ -43,7 +43,7 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="page">
-        <div>SafeXCity · Instituto de Telecomunicações & Universidade de Aveiro · Aveiro Tech City Living Lab.</div>
+        <div>UrbanEgo · Instituto de Telecomunicações & Universidade de Aveiro · Aveiro Tech City Living Lab.</div>
         <div>Map data © OpenStreetMap contributors, © CARTO.</div>
       </div>
     </footer>

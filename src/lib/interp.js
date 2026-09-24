@@ -1,4 +1,4 @@
-// Time-interpolation of GPS / heading / IMU, ported from the SafeXCity validation
+// Time-interpolation of GPS / heading / IMU, ported from the UrbanEgo validation
 // dashboard (validate_gps.html). All track times are in seconds since session start;
 // the caller samples at gt = clip_start_s + video.currentTime.
 

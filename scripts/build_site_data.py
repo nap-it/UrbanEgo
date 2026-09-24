@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Build all static data + media for the SafeXCity dataset website into
+Build all static data + media for the UrbanEgo dataset website into
 dataset-site/public/. Reuses the validation dashboard's HLP2 extractor and the
 YOLO outputs; produces:
 
@@ -26,8 +26,16 @@ REPO = Path(__file__).resolve().parents[2]            # mobile_object_detector/
 SITE = Path(__file__).resolve().parents[1]            # dataset-site/
 RECORDINGS = REPO / "hololens_pubsub" / "recordings" / "validation"
 YOLO_RESULTS = REPO / "yolo" / "results"
+REPACKAGED = REPO / "dataset_repackaged"              # released, anonymized rgb.mp4 lives here
 OUT_DATA = SITE / "public" / "data"
 OUT_CLIPS = SITE / "public" / "clips"
+
+
+def repackaged_rgb(rid):
+    """The released, face/plate-anonymized rgb.mp4 for a run id (runN_<rid>/rgb.mp4).
+    Preview clips are cut from this, never from the raw non-anonymized recording."""
+    hits = sorted(REPACKAGED.glob(f"run*_{rid}/rgb.mp4"))
+    return hits[0] if hits else None
 
 # Reuse the proven HLP2 extractor and the YOLO GPS reader.
 sys.path.insert(0, str(REPO / "hololens-pubsub-dataset-dashboard" / "scripts"))
@@ -188,9 +196,9 @@ def main():
         # preview clips + clip_start_s (session-relative)
         run["clip_start_s"] = None
         run["rgb_clip"] = run["depth_clip"] = ""
-        rgb_src = run_dir / "validation_rgb.mp4"
+        rgb_src = repackaged_rgb(rid)              # anonymized released video (not the raw recording)
         depth_src = run_dir / "validation_depth.mp4"
-        if not args.no_clips and rgb_src.exists():
+        if not args.no_clips and rgb_src and rgb_src.exists():
             ss_sess = pick_window(run_dir, run["video_offset_s"], run["vam"],
                                   run["duration"], args.clip_seconds)
             run["clip_start_s"] = ss_sess
@@ -227,8 +235,8 @@ def main():
         "n_runs": len(index),
         "total_duration_s": round(tot_dur, 1),
         "total_distance_m": round(tot_dist, 1),
-        "total_size_gb": 60.8,
-        "streams": ["RGB video", "depth", "spatial audio", "VAM GPS", "phone GPS", "heading", "IMU"],
+        "total_size_gb": 7.4,
+        "streams": ["RGB video", "audio", "depth", "infrared", "VAM GPS", "phone GPS", "heading", "IMU"],
         "detection": {"model": "YOLO11x", "tracker": "BoT-SORT + ReID",
                       "classes": ["pedestrians", "bicycles", "vehicles"]},
     }

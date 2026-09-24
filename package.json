@@ -1,9 +1,9 @@
 {
-  "name": "safexcity-dataset-site",
+  "name": "urbanego-dataset-site",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Public showcase site for the SafeXCity wearable HoloLens VRU dataset and article.",
+  "description": "Public showcase site for the UrbanEgo wearable HoloLens VRU dataset and article.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

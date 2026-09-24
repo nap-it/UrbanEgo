@@ -1,6 +1,6 @@
-# SafeXCity Dataset Website
+# UrbanEgo Dataset Website
 
-Public presentation site for the **SafeXCity** wearable-HoloLens VRU dataset and its
+Public presentation site for the **UrbanEgo** wearable-HoloLens VRU dataset and its
 article. It has an academic, text-forward landing page (description, data & format
 tables, object-detection layer, recordings, download, citation) and an interactive
 per-run viewer: a synchronized **video ↔ map ↔ heading** player plus a
@@ -8,8 +8,8 @@ pedestrian/vehicle **observation-density heatmap**.
 
 Built with **Vite + React**, fully static, deployed to **GitLab Pages**.
 
-Part of the SafeXCity project (Instituto de Telecomunicações & Universidade de Aveiro,
-Aveiro Tech City Living Lab). Companion to
+Developed at the Instituto de Telecomunicações & Universidade de Aveiro (Aveiro Tech
+City Living Lab). Companion to
 [hololens-pubsub-dataset-dashboard](../hololens-pubsub-dataset-dashboard) (the internal
 validation dashboard this site's sync logic is derived from).
 
@@ -44,14 +44,16 @@ builds and deploys on its own:
 | `public/data/<id>.json` | per-run GPS / heading / IMU tracks + `clip_start_s` |
 | `public/data/<id>_heat.json` | ego-observation density (pedestrian / vehicle) |
 | `public/data/summary.json` | homepage totals |
-| `public/clips/<id>_{rgb,depth}.mp4` | very short ~480p preview clips (drive the map sync) |
+| `public/clips/<id>_{rgb,depth}.mp4` | very short ~480p preview clips (drive the map sync); RGB cut from the **anonymized** released video |
 | `public/figures/*.png` | banner + snapshot figures |
 | `public/banner2.jpg` | header banner image |
 
 **Regenerating the data** (only needed when recordings/detections change) requires the
-full SafeXCity workspace, since `scripts/build_site_data.py` reads the sibling
-`../hololens-pubsub-dataset-dashboard` extractor and the `../yolo` / `../hololens_pubsub`
-outputs. It is **not** needed to build or deploy the site from the committed `public/`.
+full workspace, since `scripts/build_site_data.py` reads the sibling
+`../hololens-pubsub-dataset-dashboard` extractor, the `../yolo` / `../hololens_pubsub`
+outputs, and the anonymized `../dataset_repackaged` videos (RGB preview clips are cut
+from those, never from the raw recording). It is **not** needed to build or deploy the
+site from the committed `public/`.
 
 ```bash
 <viewer-venv>/bin/python scripts/build_site_data.py            # data + preview clips
