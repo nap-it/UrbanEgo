@@ -5,6 +5,7 @@ import { LINKS, asset } from './lib/data.js'
 
 const SECTIONS = [
   ['overview', 'Overview'],
+  ['demo', 'Demo'],
   ['data', 'Data & Format'],
   ['detections', 'Detections'],
   ['runs', 'Runs'],
@@ -44,7 +45,7 @@ function Footer() {
     <footer className="site-footer">
       <div className="page">
         <div>UrbanEgo · Instituto de Telecomunicações & Universidade de Aveiro · Aveiro Tech City Living Lab.</div>
-        <div>Map data © OpenStreetMap contributors, © CARTO.</div>
+        <div>Basemap tiles © Esri.</div>
       </div>
     </footer>
   )

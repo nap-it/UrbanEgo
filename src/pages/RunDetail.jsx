@@ -32,10 +32,10 @@ export default function RunDetail() {
         <span className="sep">›</span>
         <Link to="/" state={{ scrollTo: 'runs' }}>Recordings</Link>
         <span className="sep">›</span>
-        <span className="current">Run {num ?? ''} — {zoneOf(id)}</span>
+        <span className="current">Run {num ?? ''} · {zoneOf(id)}</span>
       </nav>
       <h2 className="detail-title">{zoneOf(id)}</h2>
-      <div className="detail-sub">Run {num ?? ''} · <span className="mono">{run.id}</span> — {noteOf(id)}</div>
+      <div className="detail-sub">Run {num ?? ''} · <span className="mono">{run.id}</span> · {noteOf(id)}</div>
 
       <div className="detail-meta">
         <div className="m"><span className="k">Date</span><span className="v">{run.date}</span></div>

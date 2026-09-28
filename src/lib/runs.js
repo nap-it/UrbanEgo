@@ -13,14 +13,14 @@ export const ZONES = {
 }
 
 export const NOTES = {
-  '20260506_152621': 'University of Aveiro campus and adjacent streets — five marked crossings and a roundabout, mixed-use with moderate traffic.',
-  '20260506_163935': 'Out-and-back along Rua da Pêga beside Lago Siza Vieira — a quieter lakeside arterial with a crosswalk.',
+  '20260506_152621': 'University of Aveiro campus and adjacent streets: five marked crossings and a roundabout, mixed-use with moderate traffic.',
+  '20260506_163935': 'Out-and-back along Rua da Pêga beside Lago Siza Vieira, a quieter lakeside arterial with two crosswalks.',
   '20260507_151920': 'The most varied route: campus into the surrounding urban area during high traffic, including an unsignalised crossing.',
   '20260701_124734': 'A second pass along Rua da Pêga, repeating the Run 2 route on a different day.',
-  '20260713_173511': 'Part of the campus combined with the hospital roundabout.',
+  '20260713_173511': 'Repeats the Run 3 route (campus into the surrounding urban area and the hospital roundabout) on a different day.',
   '20260714_161537': 'The busier Ponte dos Botirões area, with dense vehicle traffic.',
-  '20260714_171427': 'The Rossio — one of the busiest, most touristic areas of central Aveiro, beside the canal (boats and buses appear).',
-  '20260714_174138': 'The historic centre around Praça do Peixe — a compact, pedestrian-dense area.',
+  '20260714_171427': 'The Rossio, one of the busiest, most touristic areas of central Aveiro, beside the canal (boats and buses appear).',
+  '20260714_174138': 'The historic centre around Praça do Peixe, a compact, pedestrian-dense area.',
 }
 
 export const zoneOf = (id) => ZONES[id] || 'Urban route'

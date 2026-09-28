@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet.heat'
 
-const CARTO = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+const BASEMAP = 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
 const GRADIENTS = {
   ped: { 0.2: '#dbeafe', 0.5: '#60a5fa', 1.0: '#1d4ed8' },
   veh: { 0.2: '#d1fae5', 0.5: '#34d399', 1.0: '#047857' },
@@ -16,7 +16,7 @@ export default function HeatMap({ run, heat }) {
 
   useEffect(() => {
     const m = L.map(mapDiv.current, { zoomControl: true })
-    L.tileLayer(CARTO, { subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO' }).addTo(m)
+    L.tileLayer(BASEMAP, { maxZoom: 18, maxNativeZoom: 16, attribution: 'Tiles © Esri' }).addTo(m)
     const route = (run.phone.length ? run.phone : run.vam).map((p) => [p[0], p[1]])
     if (route.length) {
       L.polyline(route, { color: '#8a887f', weight: 1.5, opacity: 0.6 }).addTo(m)
@@ -50,7 +50,7 @@ export default function HeatMap({ run, heat }) {
         <div className="notice">
           Intensity is the mean per-frame count of {cls === 'ped' ? 'pedestrians' : 'vehicles'} the
           wearer observed while at each ~{heat?.bin_m ?? 11} m location (ego position, from YOLO
-          detections) — a proxy for how busy each area was, not the objects' own positions.
+          detections), a proxy for how busy each area was, not the objects' own positions.
         </div>
       </div>
     </div>

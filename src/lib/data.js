@@ -21,14 +21,15 @@ export const figureURL = (name) => asset(`figures/${name}`)
 export const LINKS = {
   paper: '#', // arXiv / DOI
   dataset: '#', // Zenodo
-  code: 'https://code.nap.av.it.pt/ar_vr/mobile-cooperative-perception',
 }
 
 // Format helpers
 export function fmtDuration(s) {
   s = Math.round(s)
-  const m = Math.floor(s / 60)
+  const h = Math.floor(s / 3600)
+  const m = Math.floor((s % 3600) / 60)
   const sec = s % 60
+  if (h > 0) return `${h}h ${String(m).padStart(2, '0')}m`
   return `${m}m ${String(sec).padStart(2, '0')}s`
 }
 

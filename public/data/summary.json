@@ -2,7 +2,7 @@
   "n_runs": 8,
   "total_duration_s": 8056.0,
   "total_distance_m": 9871.8,
-  "total_size_gb": 7.4,
+  "total_size_gb": 7.8,
   "streams": [
     "RGB video",
     "audio",

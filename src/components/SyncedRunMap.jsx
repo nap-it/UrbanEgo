@@ -4,7 +4,7 @@ import { clipURL } from '../lib/data.js'
 import { interpTrack, interpHeading, headingIconHtml } from '../lib/interp.js'
 
 const MARKER_COLOR = '#0b5cad'
-const CARTO = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+const BASEMAP = 'https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
 
 // Points of `track` (session-relative [lat,lon,t]) within [t0, t1] — the clip segment.
 function segment(track, t0, t1) {
@@ -40,7 +40,7 @@ export default function SyncedRunMap({ run }) {
   // ── init map once ──
   useEffect(() => {
     const m = L.map(mapDiv.current, { zoomControl: true })
-    L.tileLayer(CARTO, { subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO' }).addTo(m)
+    L.tileLayer(BASEMAP, { maxZoom: 18, maxNativeZoom: 16, attribution: 'Tiles © Esri' }).addTo(m)
     map.current = m
     marker.current = L.marker([0, 0], {
       icon: L.divIcon({ html: headingIconHtml(0, MARKER_COLOR), className: '', iconAnchor: [22, 22] }),
@@ -67,10 +67,20 @@ export default function SyncedRunMap({ run }) {
     live.current.track = vamPrim ? run.vam : run.phone
   }, [gpsSource, run])
 
-  // ── map size changes when depth toggles (moves from side to full-width) ──
+  // ── depth toggle: when depth is shown, restart the RGB clip, the depth clip,
+  //    and the map marker to the clip start so all three stay synchronized (the
+  //    depth video mounts fresh at t=0, so the RGB clip must rewind to match).
+  //    Also resize the map, since it moves from side to full-width. ──
   useEffect(() => {
     const m = map.current
     if (!m) return
+    if (showDepth) {
+      const rv = rgbVideo.current, dv = depthVideo.current
+      if (rv) { rv.pause(); rv.currentTime = 0 }
+      if (dv) { dv.pause(); dv.currentTime = 0 }
+      setPlaying(false)
+      syncTo(0)
+    }
     const id = requestAnimationFrame(() => m.invalidateSize())
     return () => cancelAnimationFrame(id)
   }, [showDepth])

@@ -35,7 +35,7 @@ export default function Home() {
           {summary ? ` ${summary.n_runs}` : ' 8'} runs recorded across the city
           of Aveiro, Portugal ({summary ? fmtDuration(summary.total_duration_s) : '~2 h'} of footage,
           {summary ? ` ${(summary.total_distance_m / 1000).toFixed(1)} km walked` : ''},
-          {summary ? ` ${summary.total_size_gb} GB` : ' ~7.4 GB'} in standard open formats). Every
+          {summary ? ` ${summary.total_size_gb} GB` : ' ~7.8 GB'} in standard open formats). Every
           recording is also accompanied by an offline object-detection layer for road-user analysis.
         </p>
         <div className="btn-row">
@@ -43,28 +43,22 @@ export default function Home() {
           <a className="btn" href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a>
         </div>
 
-        <figure className="figrow">
-          <div className="imgs">
-            <figure>
-              <img src={figureURL('snap_rgb.png')} alt="Egocentric RGB frame" />
-              <div className="cap">RGB · egocentric frame</div>
-            </figure>
-            <figure>
-              <img src={figureURL('snap_depth.png')} alt="Long-throw depth frame" />
-              <div className="cap">Depth · long-throw</div>
-            </figure>
-            <figure>
-              <img src={figureURL('snap_map.png')} alt="Position and heading on the map" />
-              <div className="cap">Position &amp; heading</div>
-            </figure>
-          </div>
+        <figure className="demo-fig">
+          <img src={figureURL('Demo.png')} alt="UrbanEgo acquisition setup: a pedestrian wearing a HoloLens 2 and a backpack of recording hardware, with the sensed modalities labelled" />
           <figcaption>
-            <b>Figure 1.</b> One synchronized instant from Run&nbsp;2 (Rua da Pêga): the egocentric
-            RGB frame, the corresponding long-throw depth frame, and the wearer's position and
-            heading on the route. All streams share a single wall-clock timeline, so any moment can
-            be reconstructed across modalities.
+            <b>Figure 1.</b> The acquisition setup. The sensing pedestrian (VRU) wears a
+            HoloLens&nbsp;2 and a backpack of recording hardware (inset: Jetson edge computer,
+            Wi-Fi router, power banks, and smartphone), and records RGB video, depth, audio, head
+            rotation, and location while walking the route.
           </figcaption>
         </figure>
+      </section>
+
+      <section id="demo" className="anchor">
+        <h2>Demo</h2>
+        <div className="video-wip" role="img" aria-label="UrbanEgo demo video placeholder">
+          <div className="vw-title">UrbanEgo demo</div>
+        </div>
       </section>
 
       <section id="data" className="anchor">
@@ -87,7 +81,7 @@ export default function Home() {
               <tr><td className="mono">ab/*.png</td><td>Active-brightness (infrared), same grid as depth</td><td>16-bit PNG, 320×288</td><td>~5 fps</td></tr>
               <tr><td className="mono">depth_frames.jsonl</td><td>Per-depth-frame head pose</td><td>JSON Lines</td><td>~5 fps</td></tr>
               <tr><td className="mono">calibration/</td><td>Depth intrinsics/extrinsics + per-pixel unit-ray table</td><td>JSON + CSV</td><td>per run</td></tr>
-              <tr><td className="mono">gps_vam.jsonl</td><td>Hardware GPS receiver (on the Jetson)</td><td>JSON Lines</td><td>~1 Hz</td></tr>
+              <tr><td className="mono">gps_vam.jsonl</td><td>Hardware GPS receiver (on the Jetson)</td><td>JSON Lines</td><td>~0.8 Hz</td></tr>
               <tr><td className="mono">gps_phone.jsonl</td><td>Phone GPS (OwnTracks)</td><td>JSON Lines</td><td>~0.8 Hz</td></tr>
               <tr><td className="mono">heading.jsonl</td><td>Head heading (degrees from North)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
               <tr><td className="mono">imu.jsonl</td><td>Head orientation (yaw, pitch, roll)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
@@ -110,7 +104,7 @@ export default function Home() {
             <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
             <tbody>
               <tr><td className="mono">seq</td><td>int</td><td>Per-stream counter (the sample's index within its own stream)</td></tr>
-              <tr><td className="mono">ts_unix_ns</td><td>int</td><td>Wall-clock time, nanoseconds since the Unix epoch — the alignment key</td></tr>
+              <tr><td className="mono">ts_unix_ns</td><td>int</td><td>Wall-clock time, nanoseconds since the Unix epoch, the alignment key</td></tr>
               <tr><td className="mono">ts_mono_ns</td><td>int</td><td>Monotonic clock (ns); steady elapsed time that never jumps backward</td></tr>
             </tbody>
           </table>
@@ -120,7 +114,7 @@ export default function Home() {
           <span className="mono"> rgb_frames.jsonl</span> adds the head pose and camera intrinsics),
           and <span className="mono">rgb.mp4</span> plays in real time so a moment at video time
           <span className="mono"> t</span> is the instant <span className="mono">t</span> seconds after
-          the run started — as demonstrated in the synchronized viewer on each run's page.
+          the run started, as demonstrated in the synchronized viewer on each run's page.
         </p>
       </section>
 
@@ -164,12 +158,11 @@ export default function Home() {
         <h2>Download</h2>
         <div className="callout">
           <p>
-            The full dataset (standard-format files — MP4, PNG, JSON&nbsp;Lines, CSV — for all runs)
+            The full dataset (standard-format files: MP4, PNG, JSON&nbsp;Lines, and CSV, for all runs)
             will be published with a permanent DOI. A download link will appear here once released.
           </p>
           <div className="btn-row">
             <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Dataset repository</a>
-            <a className="btn" href={LINKS.code} target="_blank" rel="noreferrer">Acquisition &amp; processing code</a>
           </div>
         </div>
       </section>
@@ -180,7 +173,8 @@ export default function Home() {
         <div className="cite">{`@article{urbanego_dataset,
   title   = {UrbanEgo: A Multimodal First-Person Urban
              Perception Dataset},
-  author  = {Abreu, Rodrigo and others},
+  author  = {Abreu, Rodrigo and Clérigo, André and Silva, Gonçalo
+             and Rito, Pedro and Sargento, Susana},
   journal = {Data in Brief [to appear]},
   year    = {2026}
 }`}</div>
