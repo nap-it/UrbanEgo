@@ -30,18 +30,6 @@ export default function Home() {
           with the wearer's head orientation. It is intended for research on vulnerable-road-user
           (VRU) safety, egocentric perception, outdoor localization, and multimodal sensing.
         </p>
-        <p>
-          The dataset was collected through the Aveiro Tech City Living Lab. It comprises
-          {summary ? ` ${summary.n_runs}` : ' 8'} runs recorded across the city
-          of Aveiro, Portugal ({summary ? fmtDuration(summary.total_duration_s) : '~2 h'} of footage,
-          {summary ? ` ${(summary.total_distance_m / 1000).toFixed(1)} km walked` : ''},
-          {summary ? ` ${summary.total_size_gb} GB` : ' ~7.8 GB'} in standard open formats). Every
-          recording is also accompanied by an offline object-detection layer for road-user analysis.
-        </p>
-        <div className="btn-row">
-          <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Download the dataset</a>
-          <a className="btn" href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a>
-        </div>
 
         <figure className="demo-fig">
           <img src={figureURL('Demo.png')} alt="UrbanEgo acquisition setup: a pedestrian wearing a HoloLens 2 and a backpack of recording hardware, with the sensed modalities labelled" />
@@ -52,6 +40,30 @@ export default function Home() {
             rotation, and location while walking the route.
           </figcaption>
         </figure>
+
+        <p>
+          The dataset was collected through the Aveiro Tech City Living Lab. It comprises
+          {summary ? ` ${summary.n_runs}` : ' 8'} runs recorded across the city
+          of Aveiro, Portugal ({summary ? fmtDuration(summary.total_duration_s) : '~2 h'} of footage,
+          {summary ? ` ${(summary.total_distance_m / 1000).toFixed(1)} km walked` : ''},
+          {summary ? ` ${summary.total_size_gb} GB` : ' ~7.8 GB'} in standard open formats). Every
+          recording is also accompanied by an offline object-detection layer for road-user analysis.
+        </p>
+
+        <figure className="demo-fig">
+          <img src={figureURL('snapshot.png')} alt="One synchronized instant: the egocentric RGB frame, the matching long-throw depth frame, and the wearer's position and heading on the map" />
+          <figcaption>
+            <b>Figure 2.</b> One synchronized instant from Run&nbsp;2 (Rua da Pêga): the egocentric
+            RGB frame, the corresponding long-throw depth frame, and the wearer's position and
+            heading on the route. All streams share a single wall-clock timeline, so any moment can
+            be reconstructed across modalities.
+          </figcaption>
+        </figure>
+
+        <div className="btn-row">
+          <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Download the dataset</a>
+          <a className="btn" href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a>
+        </div>
       </section>
 
       <section id="demo" className="anchor">

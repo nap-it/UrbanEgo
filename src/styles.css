@@ -45,7 +45,7 @@ img { max-width: 100%; }
 .site-header { border-bottom: 2px solid var(--ink); }
 .banner {
   position: relative; height: 220px;
-  background-size: cover; background-position: center 55%; background-repeat: no-repeat;
+  background-size: cover; background-position: center 58%; background-repeat: no-repeat;
   display: flex; align-items: flex-end;
 }
 .banner::before {
@@ -102,7 +102,7 @@ img { max-width: 100%; }
 @media (max-width: 640px) { .figrow .imgs { grid-template-columns: 1fr; } }
 
 /* demo section: wide setup figure + video placeholder */
-.demo-fig { margin: 6px 0 4px; }
+.demo-fig { margin: 6px 0 24px; }
 .demo-fig img { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: var(--box); }
 .demo-fig figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
 .demo-fig figcaption b { color: var(--ink); }
