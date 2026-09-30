@@ -103,8 +103,6 @@ Please cite both the accompanying paper and the Zenodo dataset record when using
 
 ### Dataset (Zenodo)
 
-Use the title, creators, version, and DOI from the Zenodo record for the dataset release used.
-
 ```bibtex
 @dataset{urbanego_dataset,
   title     = {[ZENODO_RECORD_TITLE]},
@@ -117,6 +115,6 @@ Use the title, creators, version, and DOI from the Zenodo record for the dataset
 }
 ```
 
-## Licence
+## License
 
 The UrbanEgo dataset and this website are licensed under the [GNU General Public License v3.0 (GPL-3.0-only)](LICENSE).
