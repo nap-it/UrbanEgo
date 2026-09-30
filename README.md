@@ -1,8 +1,8 @@
 # UrbanEgo: A Multimodal First-Person Urban Perception Dataset
 
-**UrbanEgo** records urban environments from the viewpoint of a walking pedestrian wearing a Microsoft HoloLens 2 and a backpack containing an NVIDIA Jetson edge computer. It combines egocentric RGB video with stereo audio, long-throw depth and infrared frames, head pose and heading, orientation angles, and two independent GPS sources. An offline road-user detection and tracking layer accompanies the sensor recordings.
+**UrbanEgo** records urban environments from the viewpoint of a walking pedestrian wearing a Microsoft HoloLens 2 and a backpack containing an NVIDIA Jetson edge computer. It combines egocentric RGB video with long-throw depth, infrared frames, head pose, heading, orientation angles, and two independent GPS sources. An offline road-user detection and tracking layer accompanies the sensor recordings.
 
-The collection consists of **eight runs**, approximately **2 h 14 min of recording sessions** and **7.8 GB** of data. The released RGB videos contain approximately **2 h 08 min 11 s** in total. The data were collected in **Aveiro, Portugal**, between May and July 2026. All runs were recorded by one researcher during daytime and fair weather.
+The collection consists of **eight runs**, approximately **2 h of recording sessions** and **8 GB** of data. The data were collected in **Aveiro, Portugal**, between May and July 2026. All runs were recorded by one researcher during daytime and fair weather.
 
 ![UrbanEgo acquisition setup and recorded modalities](public/figures/Demo.png)
 
@@ -79,21 +79,15 @@ Per-frame density measures detector output independently of tracking identities.
 
 ## Limitations and privacy
 
-- **Collection scope:** one wearer, eight walks, one city, daytime and fair weather. The collection does not cover night-time, adverse weather, or systematically varied pedestrian behaviour.
-- **Automatic labels:** detections and tracks have not been human-verified. They are an automatic baseline and can contain errors, especially for small, distant, or occluded road users.
-- **Tracking identities:** detector IDs can fragment or switch between observations and should not be treated as verified persistent identities.
-- **Depth range:** the depth stream covers only a few metres at low resolution and rate, limiting its use for locating street objects.
-- **GPS coverage:** the hardware receiver starts 45–70 seconds late in two early runs. The phone track can bridge those gaps, but stream end times also vary.
-- **GPS quality:** discard invalid latitude/longitude values and implausible jumps. The phone track in Run 3 has particularly frequent outliers. The hardware receiver's altitude field is an unavailable-value sentinel and should be ignored.
-- **Phone speed:** a missing `speed_mps` value means that phone speed is unavailable for that record; do not interpret it as zero.
+- **Collection scope:** the collection does not cover night-time, adverse weather, or systematically varied pedestrian behaviour.
+- **Automatic labels:** detections and tracks are an automatic baseline and can contain errors.
 - **Privacy:** released RGB video is processed with automatic face and vehicle licence-plate blurring. The process can miss identifiable content, so residual identifiable content may remain.
 - **Calibration and coordinates:** pose and calibration matrices refer to local HoloLens tracking/sensor frames, not WGS-84 coordinates. Confirm the coordinate convention, matrix multiplication order, and transform direction before projecting points between camera, rig, and world frames.
 - **Image representation:** depth and infrared images are stored as lossless 16-bit PNG files; lossless PNG storage does not by itself establish bit-exact equality with the original sensor stream.
 
-
 ## Citations
 
-Please cite both the accompanying paper and the Zenodo dataset record when using UrbanEgo. These are **placeholder templates**: replace every bracketed field with the final publication metadata before use.
+Please cite both the accompanying paper and the Zenodo dataset record when using UrbanEgo.
 
 ### Paper
 
