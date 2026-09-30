@@ -35,6 +35,7 @@ export default function SyncedRunMap({ run }) {
   const [gpsSource, setGpsSource] = useState(run.vam.length ? 'vam' : 'phone')
   const [showDepth, setShowDepth] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [videoAspects, setVideoAspects] = useState({ rgb: 16 / 9, depth: 10 / 9 })
   const clipDurRef = useRef(20)
 
   // ── init map once ──
@@ -70,7 +71,7 @@ export default function SyncedRunMap({ run }) {
   // ── depth toggle: when depth is shown, restart the RGB clip, the depth clip,
   //    and the map marker to the clip start so all three stay synchronized (the
   //    depth video mounts fresh at t=0, so the RGB clip must rewind to match).
-  //    Also resize the map, since it moves from side to full-width. ──
+  //    ──
   useEffect(() => {
     const m = map.current
     if (!m) return
@@ -81,9 +82,15 @@ export default function SyncedRunMap({ run }) {
       setPlaying(false)
       syncTo(0)
     }
+  }, [showDepth])
+
+  // Resize after the video dimensions load or the map moves below both streams.
+  useEffect(() => {
+    const m = map.current
+    if (!m) return
     const id = requestAnimationFrame(() => m.invalidateSize())
     return () => cancelAnimationFrame(id)
-  }, [showDepth])
+  }, [showDepth, videoAspects])
 
   // ── per-frame sync (driven by the RGB clip's time) ──
   function syncTo(currentTime) {
@@ -95,13 +102,22 @@ export default function SyncedRunMap({ run }) {
       const svg = marker.current.getElement()?.querySelector('svg')
       if (svg) svg.style.transform = `rotate(${hdg}deg)`
     }
-    if (hReadout.current) hReadout.current.textContent = `${String(Math.round(((hdg % 360) + 360) % 360)).padStart(3, '0')}°`
+    if (hReadout.current) hReadout.current.textContent = `${Math.round(((hdg % 360) + 360) % 360) % 360}°`
     const dur = clipDurRef.current || 1
     if (scrubber.current) scrubber.current.value = String((currentTime / dur) * 1000)
     if (tReadout.current) tReadout.current.textContent = `${currentTime.toFixed(1)} / ${dur.toFixed(0)}s`
   }
 
-  function onLoaded() { clipDurRef.current = rgbVideo.current?.duration || 20; syncTo(0) }
+  function updateVideoAspect(kind, video) {
+    if (video?.videoWidth && video.videoHeight) {
+      setVideoAspects((aspects) => ({ ...aspects, [kind]: video.videoWidth / video.videoHeight }))
+    }
+  }
+  function onLoaded() {
+    clipDurRef.current = rgbVideo.current?.duration || 20
+    updateVideoAspect('rgb', rgbVideo.current)
+    syncTo(0)
+  }
   function onTime() { syncTo(rgbVideo.current?.currentTime || 0) }
 
   function togglePlay() {
@@ -116,24 +132,19 @@ export default function SyncedRunMap({ run }) {
     if (depthVideo.current) depthVideo.current.currentTime = t
     syncTo(t)
   }
-  function onSpeed(e) {
-    const r = Number(e.target.value)
-    if (rgbVideo.current) rgbVideo.current.playbackRate = r
-    if (depthVideo.current) depthVideo.current.playbackRate = r
-  }
 
   return (
-    <div className="panel">
+    <div className="panel stream-panel">
       <div className="panel-head">
         <h3>Synchronised stream &amp; map</h3>
         <div className="legend">
           <span><span className="dot" style={{ background: MARKER_COLOR }} />VAM GPS</span>
-          <span><span className="dot" style={{ background: '#f59e0b' }} />phone GPS</span>
-          <span><span className="dot" style={{ background: '#d81e5b' }} />clip segment</span>
+          <span><span className="dot" style={{ background: '#f59e0b' }} />Phone GPS</span>
+          <span><span className="dot" style={{ background: '#d81e5b' }} />Clip Segment</span>
         </div>
       </div>
       <div className="panel-body">
-        <div className={`viewer2 ${showDepth ? 'd-on' : 'd-off'}`}>
+        <div className={`viewer2 ${showDepth ? 'd-on' : 'd-off'}`} style={{ '--rgb-column': `${videoAspects.rgb}fr`, '--depth-column': `${videoAspects.depth}fr` }}>
           <div className="viewer-video va-rgb">
             {run.rgb_clip
               ? <video ref={rgbVideo} src={clipURL(run.rgb_clip.replace('clips/', ''))}
@@ -142,27 +153,40 @@ export default function SyncedRunMap({ run }) {
           </div>
           {showDepth && run.depth_clip &&
             <div className="viewer-video va-depth">
-              <video ref={depthVideo} src={clipURL(run.depth_clip.replace('clips/', ''))} muted playsInline preload="auto" />
+              <video ref={depthVideo} src={clipURL(run.depth_clip.replace('clips/', ''))}
+                     onLoadedMetadata={(event) => updateVideoAspect('depth', event.currentTarget)} muted playsInline preload="auto" />
               <span className="video-tag">depth</span>
             </div>}
           <div className="leaflet-holder va-map"><div className="map" ref={mapDiv} /></div>
         </div>
-        <div className="controls">
-          <button className="iconbtn" onClick={togglePlay}>{playing ? '❚❚ Pause' : '▶ Play'}</button>
-          <input ref={scrubber} className="scrub" type="range" min="0" max="1000" defaultValue="0" onInput={onScrub} aria-label="Seek" />
-          <span ref={tReadout} className="tval">0.0 / 20s</span>
-          <span className="tval">hdg <span ref={hReadout}>000°</span></span>
-          <select className="iconbtn" onChange={onSpeed} defaultValue="1" aria-label="Speed">
-            <option value="0.5">0.5×</option><option value="1">1×</option><option value="2">2×</option>
-          </select>
-          <div className="seg" role="group" aria-label="GPS source">
-            <button className={gpsSource === 'vam' ? 'on' : ''} disabled={!run.vam.length} onClick={() => setGpsSource('vam')}>VAM</button>
-            <button className={gpsSource === 'phone' ? 'on' : ''} disabled={!run.phone.length} onClick={() => setGpsSource('phone')}>Phone</button>
+        <div className="player-controls">
+          <div className="player-timeline">
+            <button type="button" className="iconbtn play-button" onClick={togglePlay} disabled={!run.rgb_clip}>
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+                {playing ? <path d="M4 3h3v10H4zm5 0h3v10H9z" fill="currentColor" /> : <path d="M4 2.5v11l9-5.5z" fill="currentColor" />}
+              </svg>
+              {playing ? 'Pause' : 'Play'}
+            </button>
+            <input ref={scrubber} className="scrub" type="range" min="0" max="1000" defaultValue="0" onInput={onScrub} aria-label="Seek" disabled={!run.rgb_clip} />
+            <span ref={tReadout} className="tval playback-time">0.0 / 20s</span>
           </div>
-          {run.depth_clip &&
-            <button className="iconbtn" onClick={() => setShowDepth((s) => !s)}>
-              {showDepth ? 'Hide depth' : 'Show depth'}
-            </button>}
+          <div className="player-settings">
+            <div className="player-setting heading-readout">
+              <span className="control-label">Heading</span>
+              <span ref={hReadout} className="tval">0°</span>
+            </div>
+            <div className="player-setting">
+              <span className="control-label">GPS source</span>
+              <div className="seg" role="group" aria-label="GPS source">
+                <button type="button" className={gpsSource === 'vam' ? 'on' : ''} aria-pressed={gpsSource === 'vam'} disabled={!run.vam.length} onClick={() => setGpsSource('vam')}>VAM</button>
+                <button type="button" className={gpsSource === 'phone' ? 'on' : ''} aria-pressed={gpsSource === 'phone'} disabled={!run.phone.length} onClick={() => setGpsSource('phone')}>Phone</button>
+              </div>
+            </div>
+            {run.depth_clip &&
+              <button type="button" className="iconbtn depth-toggle" aria-pressed={showDepth} onClick={() => setShowDepth((s) => !s)}>
+                {showDepth ? 'Hide depth' : 'Show depth'}
+              </button>}
+          </div>
         </div>
         <div className="notice">
           This synchronized preview covers a ~20 s segment of the full route, highlighted in pink.
