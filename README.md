@@ -104,14 +104,15 @@ Please cite both the accompanying paper and the Zenodo dataset record when using
 ### Dataset (Zenodo)
 
 ```bibtex
-@dataset{urbanego_dataset,
-  title     = {[ZENODO_RECORD_TITLE]},
-  author    = {[ZENODO_RECORD_CREATORS]},
-  year      = {[DATASET_PUBLICATION_YEAR]},
+@dataset{rodrigo_2026_23062929,
+  author    = {Rodrigo, Abreu and Clérigo, André and Silva, Gonçalo Lourenço and Rito, Pedro and Sargento, Susana},
+  title     = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
+  month     = sep,
+  year      = 2026,
   publisher = {Zenodo},
-  version   = {[DATASET_VERSION]},
-  doi       = {[ZENODO_DATASET_DOI]},
-  url       = {https://doi.org/[ZENODO_DATASET_DOI]}
+  version   = {1.0},
+  doi       = {10.5281/zenodo.23062929},
+  url       = {https://doi.org/10.5281/zenodo.23062929}
 }
 ```
 

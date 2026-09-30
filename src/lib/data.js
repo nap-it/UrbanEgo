@@ -24,7 +24,7 @@ export const LINKS = {
   dataset: null, // Add the dataset repository URL when available.
 }
 
-// Explicit citation templates; bracketed fields await publication metadata.
+// Citations; bracketed paper fields await publication metadata.
 export const CITATIONS = {
   paper: `@article{urbanego_paper,
   title   = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
@@ -33,14 +33,15 @@ export const CITATIONS = {
   year    = {[PUBLICATION_YEAR]},
   doi     = {[PAPER_DOI]}
 }`,
-  dataset: `@dataset{urbanego_dataset,
-  title     = {[ZENODO_RECORD_TITLE]},
-  author    = {[ZENODO_RECORD_CREATORS]},
-  year      = {[DATASET_PUBLICATION_YEAR]},
+  dataset: `@dataset{rodrigo_2026_23062929,
+  author    = {Rodrigo, Abreu and Clérigo, André and Silva, Gonçalo Lourenço and Rito, Pedro and Sargento, Susana},
+  title     = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
+  month     = sep,
+  year      = 2026,
   publisher = {Zenodo},
-  version   = {[DATASET_VERSION]},
-  doi       = {[ZENODO_DATASET_DOI]},
-  url       = {https://doi.org/[ZENODO_DATASET_DOI]}
+  version   = {1.0},
+  doi       = {10.5281/zenodo.23062929},
+  url       = {https://doi.org/10.5281/zenodo.23062929}
 }`,
 }
 

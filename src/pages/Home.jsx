@@ -132,7 +132,7 @@ export default function Home() {
         <h2>Citations</h2>
         {LINKS.paper && <p><a href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a></p>}
         <CitationBlock title="Paper citation" label="Paper citation placeholder" citation={CITATIONS.paper} />
-        <CitationBlock title="Dataset citation (Zenodo)" label="Zenodo dataset citation placeholder" citation={CITATIONS.dataset} />
+        <CitationBlock title="Dataset citation (Zenodo)" label="Zenodo dataset citation" citation={CITATIONS.dataset} />
       </section>
 
       <section id="license" className="anchor">
