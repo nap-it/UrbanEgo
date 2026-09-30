@@ -20,6 +20,7 @@ import argparse
 import json
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]            # mobile_object_detector/
@@ -31,11 +32,34 @@ OUT_DATA = SITE / "public" / "data"
 OUT_CLIPS = SITE / "public" / "clips"
 
 
-def repackaged_rgb(rid):
-    """The released, face/plate-anonymized rgb.mp4 for a run id (runN_<rid>/rgb.mp4).
-    Preview clips are cut from this, never from the raw non-anonymized recording."""
-    hits = sorted(REPACKAGED.glob(f"run*_{rid}/rgb.mp4"))
-    return hits[0] if hits else None
+def repackaged_run(rid, release_dir):
+    """Find the release folder that supplies the site's media and metadata."""
+    hits = sorted(release_dir.glob(f"run*_{rid}/manifest.json"))
+    if len(hits) != 1:
+        raise ValueError(f"Expected one released run for {rid} in {release_dir}; found {len(hits)}")
+    return hits[0].parent
+
+
+def released_run_metadata(run_dir):
+    """Read corrected release counts; size is the current run folder in decimal GB."""
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    stats = manifest["stats"]
+    required = ("session_duration_s", "rgb_duration_s", "rgb_encoded_frames", "rgb_metadata_frames")
+    if manifest.get("format_version", 1) < 2 or any(key not in stats for key in required):
+        raise ValueError(f"Refresh the release manifest to metadata layout version 2: {run_dir}")
+    return {
+        "session_start_utc": datetime.fromtimestamp(
+            manifest["timing"]["session_start_ts_unix_ns"] / 1e9, timezone.utc
+        ).strftime("%Y-%m-%d %H:%M:%S"),
+        "duration": round(stats["session_duration_s"], 2),
+        "session_duration_s": stats["session_duration_s"],
+        "rgb_duration_s": stats["rgb_duration_s"],
+        "rgb_encoded_frames": stats["rgb_encoded_frames"],
+        "rgb_metadata_frames": stats["rgb_metadata_frames"],
+        "rgb_fps": stats["rgb_fps"],
+        "size_gb": round(sum(path.stat().st_size for path in run_dir.rglob("*")
+                             if path.is_file()) / 1e9, 3),
+    }
 
 # Reuse the proven HLP2 extractor and the YOLO GPS reader.
 sys.path.insert(0, str(REPO / "hololens-pubsub-dataset-dashboard" / "scripts"))
@@ -176,6 +200,8 @@ def main():
     ap = argparse.ArgumentParser(description="Build static data + media for the site")
     ap.add_argument("--no-clips", action="store_true", help="skip ffmpeg clip generation")
     ap.add_argument("--clip-seconds", type=float, default=20.0)
+    ap.add_argument("--release-dir", type=Path, default=REPACKAGED,
+                    help="dataset release folders with corrected version-2 manifests")
     args = ap.parse_args()
 
     OUT_DATA.mkdir(parents=True, exist_ok=True)
@@ -186,17 +212,19 @@ def main():
     print(f"{len(run_dirs)} runs in {RECORDINGS}")
 
     index = []
-    tot_dur = tot_dist = 0.0
+    tot_dur = tot_dist = tot_rgb_dur = tot_size = 0.0
     for run_dir in run_dirs:
         run = E.extract_run(run_dir)                 # reuse proven extraction
         rid = run["id"]
+        release_run = repackaged_run(rid, args.release_dir)
+        run.update(released_run_metadata(release_run))
         track = run["phone"] if len(run["phone"]) >= len(run["vam"]) else run["vam"]
         run["distance_m"] = route_distance_m(track)
 
         # preview clips + clip_start_s (session-relative)
         run["clip_start_s"] = None
         run["rgb_clip"] = run["depth_clip"] = ""
-        rgb_src = repackaged_rgb(rid)              # anonymized released video (not the raw recording)
+        rgb_src = release_run / "rgb.mp4"          # released, automatically blurred video
         depth_src = run_dir / "validation_depth.mp4"
         if not args.no_clips and rgb_src and rgb_src.exists():
             ss_sess = pick_window(run_dir, run["video_offset_s"], run["vam"],
@@ -222,8 +250,11 @@ def main():
             (OUT_DATA / f"{rid}_heat.json").write_text(json.dumps(heat, separators=(",", ":")))
 
         tot_dur += run["duration"]; tot_dist += run["distance_m"]
+        tot_rgb_dur += run["rgb_duration_s"]; tot_size += run["size_gb"]
         index.append({"id": rid, "label": run["label"], "date": run["date"],
                       "duration": run["duration"], "distance_m": run["distance_m"],
+                      "rgb_duration_s": run["rgb_duration_s"], "size_gb": run["size_gb"],
+                      "session_start_utc": run["session_start_utc"],
                       "has_clip": bool(run["rgb_clip"]), "has_depth": bool(run["depth_clip"]),
                       "has_heat": bool(heat),
                       "thumb": thumb_polyline(track)})   # small route polyline for the card
@@ -234,8 +265,9 @@ def main():
     summary = {
         "n_runs": len(index),
         "total_duration_s": round(tot_dur, 1),
+        "total_rgb_duration_s": round(tot_rgb_dur, 3),
         "total_distance_m": round(tot_dist, 1),
-        "total_size_gb": 7.4,
+        "total_size_gb": round(tot_size, 1),
         "streams": ["RGB video", "audio", "depth", "infrared", "VAM GPS", "phone GPS", "heading", "IMU"],
         "detection": {"model": "YOLO11x", "tracker": "BoT-SORT + ReID",
                       "classes": ["pedestrians", "bicycles", "vehicles"]},
