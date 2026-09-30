@@ -1,7 +1,7 @@
 {
   "name": "urbanego-dataset-site",
   "private": true,
-  "license": "GPL-3.0-only",
+  "license": "CC-BY-4.0",
   "version": "0.1.0",
   "type": "module",
   "description": "Public showcase site for the UrbanEgo wearable HoloLens VRU dataset and article.",

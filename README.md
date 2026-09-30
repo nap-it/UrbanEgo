@@ -118,4 +118,4 @@ Please cite both the accompanying paper and the Zenodo dataset record when using
 
 ## License
 
-The UrbanEgo dataset and this website are licensed under the [GNU General Public License v3.0 (GPL-3.0-only)](LICENSE).
+The UrbanEgo dataset and this website are licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).

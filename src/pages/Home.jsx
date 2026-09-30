@@ -139,8 +139,8 @@ export default function Home() {
         <h2>License</h2>
         <p>
           The UrbanEgo dataset and this website are licensed under the
-          {' '}<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noreferrer">
-            GNU General Public License v3.0 (GPL-3.0)
+          {' '}<a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
+            Creative Commons Attribution 4.0 International (CC BY 4.0)
           </a>.
         </p>
       </section>
