@@ -17,10 +17,31 @@ export const dataURL = (name) => asset(`data/${name}`)
 export const clipURL = (name) => asset(`clips/${name}`)
 export const figureURL = (name) => asset(`figures/${name}`)
 
-// External link targets (placeholders until the paper/dataset are published).
+// Public links. Leave unavailable release links null to avoid dead actions.
 export const LINKS = {
-  paper: '#', // arXiv / DOI
-  dataset: '#', // Zenodo
+  demo: 'https://youtu.be/-RTJkzZOtU8',
+  paper: null, // Add the public manuscript or published article URL when available.
+  dataset: null, // Add the dataset repository URL when available.
+}
+
+// Explicit citation templates; bracketed fields await publication metadata.
+export const CITATIONS = {
+  paper: `@article{urbanego_paper,
+  title   = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
+  author  = {Abreu, Rodrigo and Clérigo, André and Silva, Gonçalo and Rito, Pedro and Sargento, Susana},
+  journal = {[JOURNAL]},
+  year    = {[PUBLICATION_YEAR]},
+  doi     = {[PAPER_DOI]}
+}`,
+  dataset: `@dataset{urbanego_dataset,
+  title     = {[ZENODO_RECORD_TITLE]},
+  author    = {[ZENODO_RECORD_CREATORS]},
+  year      = {[DATASET_PUBLICATION_YEAR]},
+  publisher = {Zenodo},
+  version   = {[DATASET_VERSION]},
+  doi       = {[ZENODO_DATASET_DOI]},
+  url       = {https://doi.org/[ZENODO_DATASET_DOI]}
+}`,
 }
 
 // Format helpers

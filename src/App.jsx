@@ -9,8 +9,9 @@ const SECTIONS = [
   ['data', 'Data & Format'],
   ['detections', 'Detections'],
   ['runs', 'Runs'],
+  ['limitations', 'Limitations'],
   ['download', 'Download'],
-  ['cite', 'Citation'],
+  ['cite', 'Paper & Citation'],
 ]
 
 function Header() {
@@ -27,14 +28,14 @@ function Header() {
           <Link to="/" className="brand">
             <h1>UrbanEgo Dataset</h1>
           </Link>
-          <div className="tagline">A wearable HoloLens&nbsp;2 dataset for vulnerable-road-user research in urban environments</div>
+          <div className="tagline">Multimodal first-person urban perception from a pedestrian's viewpoint</div>
         </div>
       </div>
       <nav className="mainnav">
         {SECTIONS.map(([id, label]) => (
           <button key={id} onClick={() => goto(id)}>{label}</button>
         ))}
-        <a href={LINKS.paper} target="_blank" rel="noreferrer">Paper</a>
+        {LINKS.paper && <a href={LINKS.paper} target="_blank" rel="noreferrer">Paper</a>}
       </nav>
     </header>
   )
@@ -44,7 +45,7 @@ function Footer() {
   return (
     <footer className="site-footer">
       <div className="page">
-        <div>UrbanEgo · Instituto de Telecomunicações & Universidade de Aveiro · Aveiro Tech City Living Lab.</div>
+        <div>UrbanEgo · Instituto de Telecomunicações & Universidade de Aveiro.</div>
         <div>Basemap tiles © Esri.</div>
       </div>
     </footer>
