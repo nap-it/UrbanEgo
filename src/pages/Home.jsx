@@ -45,8 +45,10 @@ export default function Home() {
           Collected in Aveiro, Portugal, the dataset comprises
           {summary ? ` ${summary.n_runs}` : ' 8'} runs recorded across the city
           between May and July&nbsp;2026: approximately
-          {summary ? ` ${fmtDuration(summary.total_duration_s)}` : ' 2 h 14 min'} of recordings and
-          {summary ? ` ${summary.total_size_gb} GB` : ' 7.8 GB'} in standard formats.
+          {summary ? ` ${fmtDuration(summary.total_duration_s)}` : ' 2 h 14 min'} across the recording sessions.
+          The exported RGB videos total
+          {summary?.total_rgb_duration_s != null ? ` ${fmtDuration(summary.total_rgb_duration_s)}` : ' 2 h 08 min 11 s'}.
+          The release contains {summary ? `${summary.total_size_gb} GB` : '7.8 GB'} of data in standard formats.
           The routes cover the University of Aveiro campus, the Rua da Pêga lakeside arterial,
           and the touristic city centre. One researcher recorded all runs during daytime and fair weather.
         </p>
@@ -111,8 +113,8 @@ export default function Home() {
               <tr><th>File / folder</th><th>Content</th><th>Format</th><th>Rate</th></tr>
             </thead>
             <tbody>
-              <tr><td className="mono">rgb.mp4</td><td>Egocentric video with audio</td><td>H.264 1280×720 + AAC 48&nbsp;kHz</td><td>20 fps (real time)</td></tr>
-              <tr><td className="mono">rgb_frames.jsonl</td><td>Per-frame head pose &amp; camera intrinsics</td><td>JSON Lines</td><td>~20 fps</td></tr>
+              <tr><td className="mono">rgb.mp4</td><td>Egocentric video with audio</td><td>H.264 1280×720 + AAC 48&nbsp;kHz</td><td>fixed 20 fps</td></tr>
+              <tr><td className="mono">rgb_frames.jsonl</td><td>Retained camera-frame timestamps, head pose &amp; camera intrinsics</td><td>JSON Lines</td><td>variable ~19–24 Hz</td></tr>
               <tr><td className="mono">depth/*.png</td><td>Long-throw depth (millimetres to surface)</td><td>16-bit PNG, 320×288</td><td>~5 fps</td></tr>
               <tr><td className="mono">ab/*.png</td><td>Active-brightness (infrared), same grid as depth</td><td>16-bit PNG, 320×288</td><td>~5 fps</td></tr>
               <tr><td className="mono">depth_frames.jsonl</td><td>Per-depth-frame head pose</td><td>JSON Lines</td><td>~5 fps</td></tr>
@@ -121,7 +123,7 @@ export default function Home() {
               <tr><td className="mono">gps_phone.jsonl</td><td>Phone GPS (OwnTracks)</td><td>JSON Lines</td><td>~0.8 Hz</td></tr>
               <tr><td className="mono">heading.jsonl</td><td>Corrected head heading (degrees clockwise from North)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
               <tr><td className="mono">imu.jsonl</td><td>Head orientation (yaw, pitch, roll)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
-              <tr><td className="mono">yolo/</td><td>Offline object detections (see below)</td><td>JSON Lines + JSON</td><td>per RGB frame</td></tr>
+              <tr><td className="mono">yolo/</td><td>Offline object detections (see below)</td><td>JSON Lines + JSON</td><td>per retained RGB metadata frame</td></tr>
               <tr><td className="mono">manifest.json</td><td>Run summary: identifiers, per-stream counts, layout</td><td>JSON</td><td>per run</td></tr>
             </tbody>
           </table>
@@ -132,8 +134,10 @@ export default function Home() {
           Sensor JSON Lines records (one JSON object per line) use a shared wall-clock timestamp
           convention. To associate an RGB frame with depth, GPS, or heading samples, use the frame's
           timestamp in <span className="mono">rgb_frames.jsonl</span> and match the nearest
-          <span className="mono"> ts_unix_ns</span> in the other sensor stream. Sensor records
-          include these fields:
+          <span className="mono"> ts_unix_ns</span> in the other sensor stream within their overlapping
+          coverage. Retain the time difference and reject matches across large gaps. These common fields
+          apply to sensor JSONL records; YOLO uses its own <span className="mono">frame</span>,
+          <span className="mono"> t</span>, and <span className="mono"> ts_ns</span> fields:
         </p>
         <div className="table-scroll">
           <table className="dtable">
@@ -148,20 +152,25 @@ export default function Home() {
         <p className="muted">
           Video playback time and session time can have different starting points. Use the frame
           metadata for alignment rather than assuming every stream starts at video time zero.
-          Streams can also end at different times. The detection files use frame indices and
-          <span className="mono"> ts_ns</span> for association with RGB metadata.
+          Streams can also end at different times. YOLO frame indices identify rows in the retained
+          RGB metadata sequence, not encoded MP4 frame indices; join YOLO <span className="mono">ts_ns</span>
+          to the matching RGB metadata <span className="mono">ts_unix_ns</span>.
         </p>
         <h3>Working with depth and GPS</h3>
         <p>
           Depth pixels store distances in millimetres; zero means no measurement. The accompanying
           infrared image shares the depth grid. The per-pixel ray table in
           <span className="mono"> calibration/</span> supports reconstruction of nearby 3D points
-          from the rectified depth frames. The depth sensor covers only a few metres.
+          from the rectified depth frames. The depth sensor covers only a few metres. Calibration
+          matrices refer to local HoloLens tracking and sensor frames. The export's pose-frame and
+          transform directions await confirmation; verify them before projecting points between frames.
         </p>
         <p>
           The hardware receiver's altitude is an unavailable-value sentinel and should be ignored.
-          Discard out-of-range latitude or longitude values while it acquires a fix, and filter GPS
-          jumps that imply implausible walking speeds. The released heading values include a
+          Discard out-of-range latitude or longitude values in both GPS sources, and filter GPS
+          jumps that imply implausible walking speeds. A missing phone <span className="mono">speed_mps</span>
+          value means that speed is unavailable. Check implausible reported speeds before use.
+          The released heading values include a
           correction for a constant angular offset in each run.
         </p>
       </section>
@@ -180,17 +189,18 @@ export default function Home() {
           <table className="dtable">
             <thead><tr><th>File</th><th>Row = </th><th>Fields</th></tr></thead>
             <tbody>
-              <tr><td className="mono">detections.jsonl</td><td>one tracked object per frame</td><td className="mono">t, ts_ns, frame, cls, name, id, conf, box</td></tr>
-              <tr><td className="mono">frames.jsonl</td><td>one frame (incl. empty)</td><td className="mono">frame, t, ts_ns, n, counts, per_class</td></tr>
-              <tr><td className="mono">meta.json</td><td>one object per run</td><td className="mono">run, frames_processed, duration_s, effective_fps, params</td></tr>
+              <tr><td className="mono">detections.jsonl</td><td>one tracked object per retained camera frame</td><td className="mono">t, ts_ns, frame, cls, name, id, conf, box</td></tr>
+              <tr><td className="mono">frames.jsonl</td><td>one retained camera frame (incl. empty)</td><td className="mono">frame, t, ts_ns, n, counts, per_class</td></tr>
+              <tr><td className="mono">meta.json</td><td>one object per run</td><td className="mono">run, frames_processed, duration_s, effective_fps, params, exported_video</td></tr>
             </tbody>
           </table>
         </div>
         <p>
           Detections are pixel bounding boxes, with no world-referenced object positions.
           Per-frame density measures detector output independently of track identities and remains
-          subject to detection errors. Unique-object counts and flow rates are upper-bound estimates:
-          fragmented tracks and repeated observations can inflate them. The per-run heatmaps place
+          subject to detection errors. Detection IDs can fragment or switch between observations,
+          so unique-object counts and flow rates are approximate. Missed detections and repeated
+          observations also affect the totals. The per-run heatmaps place
           observations at the wearer's GPS location and show relative density within each run.
         </p>
         <figure className="demo-fig">
@@ -203,7 +213,7 @@ export default function Home() {
         </figure>
         <h3>Pedestrian contributions to collective perception</h3>
         <p>
-          GPS, heading, phone speed, and tracked detections provide ingredients for experiments
+          GPS, heading, available phone speed, and tracked detections provide ingredients for experiments
           with Collective Perception Messages (CPMs). Generating object positions and velocities
           requires additional processing, including alignment of camera pose and depth for nearby
           objects. Objects beyond the depth range need further estimation. The dataset contains
@@ -226,6 +236,8 @@ export default function Home() {
         </p>
         {runs.length ? <RunsTable runs={runs} /> : <div className="loading">Loading runs…</div>}
         <p className="muted">
+          Session duration spans the earliest to latest sensor timestamp; RGB duration describes
+          the exported MP4 video track. GPS can continue after the video ends. Sizes use decimal GB.
           Route thumbnails and distances are derived from GPS tracks. Distances are estimates
           affected by GPS accuracy. Each run page provides a short synchronized preview of the
           RGB / depth / map streams.
@@ -240,12 +252,19 @@ export default function Home() {
             behaviour are outside this collection.</li>
           <li><b>Automatic labels.</b> Detections are an automatic baseline, not human-verified
             ground truth. Small, distant, and occluded road users may be missed.</li>
+          <li><b>Tracking identities.</b> Detection IDs can fragment or switch and should not be
+            treated as verified persistent identities.</li>
           <li><b>Depth coverage.</b> Short-range, 320×288 depth at approximately 5 fps supports
             nearby scene structure but cannot locate most street objects.</li>
           <li><b>GPS coverage and accuracy.</b> The hardware receiver starts 45–70 seconds late
             in two early runs. The phone track can bridge those gaps, but both sources can have
             outliers; the phone track in Run&nbsp;3 is particularly affected. Stream end times
             also vary.</li>
+          <li><b>Calibration.</b> Pose and calibration matrices use local sensor/tracking frames.
+            The exported transform directions await confirmation before projecting points between frames.</li>
+          <li><b>Image representation.</b> Depth and infrared frames are stored as lossless 16-bit
+            PNG files; lossless PNG storage does not by itself establish bit-exact equality with the
+            original sensor stream.</li>
           <li><b>Privacy.</b> Automatic face and licence-plate blurring may leave identifiable
             content in the released RGB video.</li>
         </ul>
@@ -268,7 +287,6 @@ export default function Home() {
 
       <section id="cite" className="anchor">
         <h2>Citations</h2>
-        <h3>Paper citation</h3>
         <p><b>UrbanEgo: A Multimodal First-Person Urban Perception Dataset</b></p>
         {LINKS.paper && <p><a href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a></p>}
         <pre className="cite" aria-label="Paper citation placeholder">{CITATIONS.paper}</pre>

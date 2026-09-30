@@ -2,7 +2,7 @@
 
 **UrbanEgo** records urban environments from the viewpoint of a walking pedestrian wearing a Microsoft HoloLens 2 and a backpack containing an NVIDIA Jetson edge computer. It combines egocentric RGB video with stereo audio, long-throw depth and infrared frames, head pose and heading, orientation angles, and two independent GPS sources. An offline road-user detection and tracking layer accompanies the sensor recordings.
 
-The collection consists of **eight runs**, approximately **2 h 14 min** of recordings and **7.8 GB** of data, collected in **Aveiro, Portugal**, between May and July 2026. All runs were recorded by one researcher during daytime and fair weather.
+The collection consists of **eight runs**, approximately **2 h 14 min of recording sessions** and **7.8 GB** of data. The released RGB videos contain approximately **2 h 08 min 11 s** in total. The data were collected in **Aveiro, Portugal**, between May and July 2026. All runs were recorded by one researcher during daytime and fair weather.
 
 ![UrbanEgo acquisition setup and recorded modalities](public/figures/Demo.png)
 
@@ -17,24 +17,26 @@ UrbanEgo provides a pedestrian perspective for research on:
 - Wearable sensing and augmented reality for pedestrian safety.
 - Pedestrian contributions to cooperative perception.
 
-The GPS, heading, phone speed, and detection streams provide ingredients for experiments with Collective Perception Messages (CPMs). Generating object positions and velocities requires additional processing. Depth can support nearby objects; objects beyond its range require further estimation. The dataset does not include generated CPMs or world-referenced object positions.
+The GPS, heading, available phone speed, and detection streams provide ingredients for experiments with Collective Perception Messages (CPMs). Generating object positions and velocities requires additional processing. Depth can support nearby objects; objects beyond its range require further estimation.
 
 ## Recording routes
 
-The runs cover three types of urban environment: the University of Aveiro campus and adjacent streets, the Rua da Pêga lakeside arterial, and the touristic city centre.
+The runs cover three types of urban environment: the University of Aveiro campus and adjacent streets, the Rua da Pêga lakeside arterial, and the touristic city center.
 
-| Run | Date | Route |
-|---|---|---|
-| 1 | 2026-05-06 | University campus loop, five marked crossings and a roundabout |
-| 2 | 2026-05-06 | Rua da Pêga, a quieter out-and-back lakeside route |
-| 3 | 2026-05-07 | Campus, surrounding streets, and hospital roundabout |
-| 4 | 2026-07-01 | Repeat of the Run 2 lakeside route |
-| 5 | 2026-07-13 | Repeat of the Run 3 campus and hospital route |
-| 6 | 2026-07-14 | Ponte dos Botirões, with dense vehicle traffic |
-| 7 | 2026-07-14 | Rossio, beside the canal, with the highest pedestrian density |
-| 8 | 2026-07-14 | Praça do Peixe, a pedestrian-dense historic square |
+Session duration spans the earliest to latest sensor timestamp in each run; RGB duration is the exported MP4 video-track duration. Durations are rounded to the nearest second; sizes use decimal GB (10⁹ bytes). Folder dates and times are UTC. Some GPS streams continue after the video ends.
 
-For pedestrian-rich scenes, start with **Runs 7 and 8**. Vehicle-rich scenes are found in **Runs 6, 4, and 3**. **Run 1** combines moderate pedestrian and vehicle traffic with the highest cycling activity. Repeated routes allow comparisons between recordings made on different days.
+| Run | Date | Session start (UTC) | Session duration | RGB duration | Size (GB) | Route |
+|---:|---|---|---:|---:|---:|---|
+| 1 | 2026-05-06 | 15:26:21 | 29m 45s | 29m 39s | 1.879 | University campus loop, five marked crossings and a roundabout |
+| 2 | 2026-05-06 | 16:39:35 | 11m 08s | 11m 04s | 0.660 | Rua da Pêga, a quieter out-and-back lakeside route |
+| 3 | 2026-05-07 | 15:19:20 | 17m 02s | 16m 57s | 1.098 | Campus, surrounding streets, and hospital roundabout |
+| 4 | 2026-07-01 | 12:47:34 | 11m 08s | 11m 04s | 0.626 | Repeat of the Run 2 lakeside route |
+| 5 | 2026-07-13 | 17:35:11 | 20m 01s | 18m 13s | 1.144 | Repeat of the Run 3 campus and hospital route |
+| 6 | 2026-07-14 | 16:15:37 | 18m 48s | 14m 58s | 0.848 | Ponte dos Botirões, with dense vehicle traffic |
+| 7 | 2026-07-14 | 17:14:27 | 16m 03s | 15m 58s | 0.915 | Rossio, beside the canal, with the highest pedestrian density |
+| 8 | 2026-07-14 | 17:41:38 | 10m 23s | 10m 19s | 0.615 | Praça do Peixe, a pedestrian-dense historic square |
+
+For pedestrian-rich scenes, start with **Runs 7 and 8**. Vehicle-rich scenes are found in **Runs 3, 4, and 6**. **Run 1** combines moderate pedestrian and vehicle traffic with the highest cycling activity. Repeated routes allow comparisons between recordings made on different days.
 
 ## Data included
 
@@ -42,8 +44,8 @@ Each run is self-contained in a folder named `runN_YYYYMMDD_HHMMSS`, where `N` i
 
 | File or folder | Content | Format and approximate rate |
 |---|---|---|
-| `rgb.mp4` | Egocentric RGB video with stereo audio | H.264, 1280×720, 20 fps; AAC, 48 kHz |
-| `rgb_frames.jsonl` | Frame timestamps, head pose, camera intrinsics, and capture settings | JSON Lines, per RGB frame |
+| `rgb.mp4` | Egocentric RGB video with stereo audio | H.264, 1280×720, fixed 20 fps; AAC, 48 kHz |
+| `rgb_frames.jsonl` | Retained camera-frame timestamps, head pose, camera intrinsics, and capture settings | JSON Lines, variable camera rate (~19–24 Hz) |
 | `depth/` | Distance to surfaces in millimetres; zero indicates no measurement | 16-bit PNG, 320×288, 5 fps |
 | `ab/` | Active-brightness infrared images matching the depth frames | 16-bit PNG, 320×288, 5 fps |
 | `depth_frames.jsonl` | Depth-frame timestamps and head pose | JSON Lines, per depth frame |
@@ -57,7 +59,11 @@ Each run is self-contained in a folder named `runN_YYYYMMDD_HHMMSS`, where `N` i
 
 ### Aligning the streams
 
-Sensor records carry a per-stream sequence number (`seq`), a wall-clock timestamp (`ts_unix_ns`, nanoseconds since the Unix epoch), and a monotonic timestamp (`ts_mono_ns`). Match samples by their wall-clock timestamps, using the camera sidecar files to associate RGB and depth frames with GPS and orientation samples. The detection files provide frame indices and `ts_ns` timestamps for association with RGB metadata.
+The release manifests use metadata layout version `2`, which separates original acquisition counts, retained RGB metadata rows, and actual exported MP4 frames. `rgb_source_frames` preserves the original count; `rgb_metadata_frames` counts sidecar/YOLO frames; `rgb_encoded_frames` and `rgb_fps` describe the MP4. `rgb_duration_s` describes RGB video duration and `session_duration_s` describes the span across sensor streams. This layout version is separate from the eventual Zenodo dataset release version.
+
+Sensor JSONL records carry a per-stream sequence number (`seq`), a wall-clock timestamp (`ts_unix_ns`, nanoseconds since the Unix epoch), and a monotonic timestamp (`ts_mono_ns`). YOLO records use a different schema: `frame`, `t`, and `ts_ns`. The YOLO `frame` and `ts_ns` values refer to the retained RGB metadata sequence and its `ts_unix_ns` values; they are not indices into the exported 20 fps MP4. Associate detections with the camera metadata by timestamp, then use timestamps to match other sensor streams.
+
+In Runs 4–8, phone records can include `source_ts_ns` (a producer timestamp stored in nanoseconds), and receiver records can include `generation_delta_time` (producer timing metadata). Their clock mapping and the receiver field's units and wrap convention have not been confirmed from the export code. Use `ts_unix_ns` for cross-stream alignment.
 
 Video playback time and session time can have different starting points. The streams also have different rates and may start or end at different times, so alignment should use the recorded timestamps rather than a shared time-zero assumption.
 
@@ -69,34 +75,21 @@ The detection layer is computed offline from the recorded camera stream using **
 - `frames.jsonl`: one record per frame, including empty frames, with group and class counts.
 - `meta.json`: processing parameters and run-level metadata.
 
-Per-frame density measures detector output independently of tracking identities. Unique-object counts and flow rates are upper-bound estimates because track fragmentation and repeated observations can inflate them.
+Per-frame density measures detector output independently of tracking identities. Unique-object counts and flow rates are approximate: missed detections, track fragmentation, ID switches, and repeated observations affect the totals. Repeated observations can inflate them.
 
 ## Limitations and privacy
 
 - **Collection scope:** one wearer, eight walks, one city, daytime and fair weather. The collection does not cover night-time, adverse weather, or systematically varied pedestrian behaviour.
 - **Automatic labels:** detections and tracks have not been human-verified. They are an automatic baseline and can contain errors, especially for small, distant, or occluded road users.
+- **Tracking identities:** detector IDs can fragment or switch between observations and should not be treated as verified persistent identities.
 - **Depth range:** the depth stream covers only a few metres at low resolution and rate, limiting its use for locating street objects.
 - **GPS coverage:** the hardware receiver starts 45–70 seconds late in two early runs. The phone track can bridge those gaps, but stream end times also vary.
 - **GPS quality:** discard invalid latitude/longitude values and implausible jumps. The phone track in Run 3 has particularly frequent outliers. The hardware receiver's altitude field is an unavailable-value sentinel and should be ignored.
+- **Phone speed:** a missing `speed_mps` value means that phone speed is unavailable for that record; do not interpret it as zero.
 - **Privacy:** released RGB video is processed with automatic face and vehicle licence-plate blurring. The process can miss identifiable content, so residual identifiable content may remain.
+- **Calibration and coordinates:** pose and calibration matrices refer to local HoloLens tracking/sensor frames, not WGS-84 coordinates. Confirm the coordinate convention, matrix multiplication order, and transform direction before projecting points between camera, rig, and world frames.
+- **Image representation:** depth and infrared images are stored as lossless 16-bit PNG files; lossless PNG storage does not by itself establish bit-exact equality with the original sensor stream.
 
-## Dataset access and previews
-
-The dataset will be hosted on Zenodo. The record URL, DOI, and access instructions will be added when available.
-
-This repository contains the dataset website, derived route data, heatmaps, and short RGB/depth preview clips. It does not contain the full dataset release. The website provides an overview and a synchronized video, map, and head-heading preview for each run. Route distances are GPS-derived estimates. Heatmap colours show relative observation density normalized within each run and class; they do not provide absolute comparisons across runs or object locations.
-
-## Accompanying paper
-
-**UrbanEgo: A Multimodal First-Person Urban Perception Dataset**
-
-Rodrigo Abreu, André Clérigo, Gonçalo Silva, Pedro Rito, and Susana Sargento.
-
-Universidade de Aveiro and Instituto de Telecomunicações, Aveiro, Portugal.
-
-A public paper link and the final citation metadata will be added when available.
-
-Corresponding author: [Rodrigo Abreu](mailto:rodrigo.abreu@ua.pt).
 
 ## Citations
 
@@ -132,4 +125,4 @@ Use the title, creators, version, and DOI from the Zenodo record for the dataset
 
 ## Licence
 
-The UrbanEgo dataset and this website are licensed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
+The UrbanEgo dataset and this website are licensed under the [GNU General Public License v3.0 (GPL-3.0-only)](LICENSE).

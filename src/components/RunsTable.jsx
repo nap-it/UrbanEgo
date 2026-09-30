@@ -10,8 +10,8 @@ export default function RunsTable({ runs }) {
       <table className="dtable runs-table">
         <thead>
           <tr>
-            <th>Route</th><th>Run</th><th>Zone</th><th>Date</th>
-            <th className="num">Duration</th><th className="num">GPS distance estimate</th><th></th>
+            <th>Route</th><th>Run</th><th>Zone</th><th>Date</th><th>Start (UTC)</th>
+            <th className="num">Session duration</th><th className="num">RGB duration</th><th className="num">Size (GB)</th><th className="num">GPS distance estimate</th><th></th>
           </tr>
         </thead>
         <tbody>
@@ -21,7 +21,10 @@ export default function RunsTable({ runs }) {
               <td className="mono">{i + 1}</td>
               <td className="z">{zoneOf(r.id)}</td>
               <td>{r.date}</td>
+              <td className="mono">{r.session_start_utc?.split(' ')[1] ?? '—'}</td>
               <td className="num">{fmtDuration(r.duration)}</td>
+              <td className="num">{r.rgb_duration_s != null ? fmtDuration(r.rgb_duration_s) : '—'}</td>
+              <td className="num">{r.size_gb != null ? r.size_gb.toFixed(3) : '—'}</td>
               <td className="num">{fmtDistance(r.distance_m)}</td>
               <td><Link to={`/runs/${r.id}`}>View details</Link></td>
             </tr>
