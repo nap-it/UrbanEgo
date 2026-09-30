@@ -155,11 +155,11 @@ def build_heat(run_dir, bin_deg=1e-4):
 
 # ── preview clips ─────────────────────────────────────────────────────────────
 
-def pick_window(run_dir, video_offset_s, vam, duration, clip_s):
+def pick_window(run_dir, video_offset_s, receiver, duration, clip_s):
     """Choose a clip window (session-relative start) with GPS coverage, preferring
     the busiest segment from the YOLO frame counts."""
-    lo = (vam[0][2] if vam else 0.0) + 2.0
-    hi = (vam[-1][2] if vam else duration) - clip_s - 2.0
+    lo = (receiver[0][2] if receiver else 0.0) + 2.0
+    hi = (receiver[-1][2] if receiver else duration) - clip_s - 2.0
     lo = max(lo, video_offset_s + 2.0)
     if hi <= lo:
         return max(lo, video_offset_s)
@@ -215,10 +215,12 @@ def main():
     tot_dur = tot_dist = tot_rgb_dur = tot_size = 0.0
     for run_dir in run_dirs:
         run = E.extract_run(run_dir)                 # reuse proven extraction
+        # Adapt the acquisition extractor's historical key to the public site schema.
+        run["receiver"] = run.pop("vam")
         rid = run["id"]
         release_run = repackaged_run(rid, args.release_dir)
         run.update(released_run_metadata(release_run))
-        track = run["phone"] if len(run["phone"]) >= len(run["vam"]) else run["vam"]
+        track = run["phone"] if len(run["phone"]) >= len(run["receiver"]) else run["receiver"]
         run["distance_m"] = route_distance_m(track)
 
         # preview clips + clip_start_s (session-relative)
@@ -227,7 +229,7 @@ def main():
         rgb_src = release_run / "rgb.mp4"          # released, automatically blurred video
         depth_src = run_dir / "validation_depth.mp4"
         if not args.no_clips and rgb_src and rgb_src.exists():
-            ss_sess = pick_window(run_dir, run["video_offset_s"], run["vam"],
+            ss_sess = pick_window(run_dir, run["video_offset_s"], run["receiver"],
                                   run["duration"], args.clip_seconds)
             run["clip_start_s"] = ss_sess
             rgb_out = OUT_CLIPS / f"{rid}_rgb.mp4"
@@ -268,7 +270,7 @@ def main():
         "total_rgb_duration_s": round(tot_rgb_dur, 3),
         "total_distance_m": round(tot_dist, 1),
         "total_size_gb": round(tot_size, 1),
-        "streams": ["RGB video", "audio", "depth", "infrared", "VAM GPS", "phone GPS", "heading", "IMU"],
+        "streams": ["RGB video", "audio", "depth", "infrared", "Receiver GPS", "Phone GPS", "heading", "IMU"],
         "detection": {"model": "YOLO11x", "tracker": "BoT-SORT + ReID",
                       "classes": ["pedestrians", "bicycles", "vehicles"]},
     }

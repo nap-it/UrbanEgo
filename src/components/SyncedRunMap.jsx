@@ -21,18 +21,18 @@ export default function SyncedRunMap({ run }) {
 
   const map = useRef(null)
   const marker = useRef(null)
-  const vamLine = useRef(null)
+  const receiverLine = useRef(null)
   const phoneLine = useRef(null)
   const segLine = useRef(null)
 
   // live values read by the (non-React) timeupdate handler
   const live = useRef({
-    track: run.vam.length ? run.vam : run.phone,
+    track: run.receiver.length ? run.receiver : run.phone,
     hdgTrack: run.hdg,
     hdgOffset: run.heading_offset || 0,
   })
 
-  const [gpsSource, setGpsSource] = useState(run.vam.length ? 'vam' : 'phone')
+  const [gpsSource, setGpsSource] = useState(run.receiver.length ? 'receiver' : 'phone')
   const [showDepth, setShowDepth] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [videoAspects, setVideoAspects] = useState({ rgb: 16 / 9, depth: 10 / 9 })
@@ -47,7 +47,7 @@ export default function SyncedRunMap({ run }) {
       icon: L.divIcon({ html: headingIconHtml(0, MARKER_COLOR), className: '', iconAnchor: [22, 22] }),
       zIndexOffset: 1000,
     }).addTo(m)
-    const all = (run.phone.length ? run.phone : run.vam).map((p) => [p[0], p[1]])
+    const all = (run.phone.length ? run.phone : run.receiver).map((p) => [p[0], p[1]])
     if (all.length) m.fitBounds(all, { padding: [24, 24] })
     return () => { m.remove(); map.current = null; marker.current = null }
   }, [run])
@@ -56,16 +56,16 @@ export default function SyncedRunMap({ run }) {
   useEffect(() => {
     const m = map.current
     if (!m) return
-    const vamPrim = gpsSource === 'vam'
-    ;[vamLine, phoneLine, segLine].forEach((r) => { if (r.current) { m.removeLayer(r.current); r.current = null } })
-    if (run.vam.length) vamLine.current = L.polyline(run.vam.map((p) => [p[0], p[1]]),
-      { color: MARKER_COLOR, weight: vamPrim ? 3 : 1.5, opacity: vamPrim ? 0.85 : 0.4, dashArray: vamPrim ? null : '5 5' }).addTo(m)
+    const receiverPrimary = gpsSource === 'receiver'
+    ;[receiverLine, phoneLine, segLine].forEach((r) => { if (r.current) { m.removeLayer(r.current); r.current = null } })
+    if (run.receiver.length) receiverLine.current = L.polyline(run.receiver.map((p) => [p[0], p[1]]),
+      { color: MARKER_COLOR, weight: receiverPrimary ? 3 : 1.5, opacity: receiverPrimary ? 0.85 : 0.4, dashArray: receiverPrimary ? null : '5 5' }).addTo(m)
     if (run.phone.length) phoneLine.current = L.polyline(run.phone.map((p) => [p[0], p[1]]),
-      { color: '#f59e0b', weight: vamPrim ? 1.5 : 3, opacity: vamPrim ? 0.4 : 0.85, dashArray: vamPrim ? '5 5' : null }).addTo(m)
+      { color: '#f59e0b', weight: receiverPrimary ? 1.5 : 3, opacity: receiverPrimary ? 0.4 : 0.85, dashArray: receiverPrimary ? '5 5' : null }).addTo(m)
     const t0 = run.clip_start_s ?? 0
-    const seg = segment(vamPrim ? run.vam : run.phone, t0, t0 + clipDurRef.current)
+    const seg = segment(receiverPrimary ? run.receiver : run.phone, t0, t0 + clipDurRef.current)
     if (seg.length > 1) segLine.current = L.polyline(seg, { color: '#d81e5b', weight: 5, opacity: 0.9 }).addTo(m)
-    live.current.track = vamPrim ? run.vam : run.phone
+    live.current.track = receiverPrimary ? run.receiver : run.phone
   }, [gpsSource, run])
 
   // ── depth toggle: when depth is shown, restart the RGB clip, the depth clip,
@@ -138,7 +138,7 @@ export default function SyncedRunMap({ run }) {
       <div className="panel-head">
         <h3>Synchronised stream &amp; map</h3>
         <div className="legend">
-          <span><span className="dot" style={{ background: MARKER_COLOR }} />VAM GPS</span>
+          <span><span className="dot" style={{ background: MARKER_COLOR }} />Receiver GPS</span>
           <span><span className="dot" style={{ background: '#f59e0b' }} />Phone GPS</span>
           <span><span className="dot" style={{ background: '#d81e5b' }} />Clip Segment</span>
         </div>
@@ -178,7 +178,7 @@ export default function SyncedRunMap({ run }) {
             <div className="player-setting">
               <span className="control-label">GPS source</span>
               <div className="seg" role="group" aria-label="GPS source">
-                <button type="button" className={gpsSource === 'vam' ? 'on' : ''} aria-pressed={gpsSource === 'vam'} disabled={!run.vam.length} onClick={() => setGpsSource('vam')}>VAM</button>
+                <button type="button" className={gpsSource === 'receiver' ? 'on' : ''} aria-pressed={gpsSource === 'receiver'} disabled={!run.receiver.length} onClick={() => setGpsSource('receiver')}>Receiver</button>
                 <button type="button" className={gpsSource === 'phone' ? 'on' : ''} aria-pressed={gpsSource === 'phone'} disabled={!run.phone.length} onClick={() => setGpsSource('phone')}>Phone</button>
               </div>
             </div>

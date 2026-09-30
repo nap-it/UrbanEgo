@@ -44,7 +44,7 @@ export default function RunDetail() {
         <div className="m"><span className="k">RGB video duration</span><span className="v">{run.rgb_duration_s != null ? fmtDuration(run.rgb_duration_s) : '—'}</span></div>
         <div className="m"><span className="k">Size (decimal GB)</span><span className="v">{run.size_gb != null ? run.size_gb.toFixed(3) : '—'}</span></div>
         <div className="m"><span className="k">GPS distance estimate</span><span className="v">{fmtDistance(run.distance_m)}</span></div>
-        <div className="m"><span className="k">GPS samples (VAM + phone)</span><span className="v">{run.vam.length + run.phone.length}</span></div>
+        <div className="m"><span className="k">GPS samples (receiver + phone)</span><span className="v">{run.receiver.length + run.phone.length}</span></div>
         <div className="m"><span className="k">Heading samples</span><span className="v">{run.hdg.length}</span></div>
       </div>
 

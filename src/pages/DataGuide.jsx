@@ -48,7 +48,7 @@ export default function DataGuide() {
             ["ab/*.png", "Active-brightness (infrared), same grid as depth", "16-bit PNG, 320×288", "~5 fps"],
             ["depth_frames.jsonl", "Per-depth-frame head pose", "JSON Lines", "~5 fps"],
             ["calibration/", "Depth intrinsics/extrinsics + per-pixel unit-ray table", "JSON + CSV", "per run"],
-            ["gps_vam.jsonl", "Hardware GPS receiver (on the Jetson)", "JSON Lines", "~0.8 Hz"],
+            ["gps_receiver.jsonl", "External GPS receiver connected to the Jetson via USB", "JSON Lines", "~0.8 Hz"],
             ["gps_phone.jsonl", "Phone GPS (OwnTracks)", "JSON Lines", "~0.8 Hz"],
             ["heading.jsonl", "Corrected head heading (degrees clockwise from North)", "JSON Lines", "~13 Hz"],
             ["imu.jsonl", "Head orientation (yaw, pitch, roll)", "JSON Lines", "~13 Hz"],

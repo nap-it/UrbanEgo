@@ -8,8 +8,8 @@
     "audio",
     "depth",
     "infrared",
-    "VAM GPS",
-    "phone GPS",
+    "Receiver GPS",
+    "Phone GPS",
     "heading",
     "IMU"
   ],

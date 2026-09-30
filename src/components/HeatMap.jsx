@@ -17,7 +17,7 @@ export default function HeatMap({ run, heat }) {
   useEffect(() => {
     const m = L.map(mapDiv.current, { zoomControl: true })
     L.tileLayer(BASEMAP, { maxZoom: 18, maxNativeZoom: 16, attribution: 'Tiles © Esri' }).addTo(m)
-    const route = (run.phone.length ? run.phone : run.vam).map((p) => [p[0], p[1]])
+    const route = (run.phone.length ? run.phone : run.receiver).map((p) => [p[0], p[1]])
     if (route.length) {
       L.polyline(route, { color: '#8a887f', weight: 1.5, opacity: 0.6 }).addTo(m)
       m.fitBounds(route, { padding: [24, 24] })

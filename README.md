@@ -50,7 +50,7 @@ Each run is self-contained in a folder named `runN_YYYYMMDD_HHMMSS`, where `N` i
 | `ab/` | Active-brightness infrared images matching the depth frames | 16-bit PNG, 320×288, 5 fps |
 | `depth_frames.jsonl` | Depth-frame timestamps and head pose | JSON Lines, per depth frame |
 | `calibration/` | Depth intrinsics, extrinsics, and per-pixel ray table | JSON and CSV, per run |
-| `gps_vam.jsonl` | Hardware GPS receiver positions | JSON Lines, 0.8 Hz |
+| `gps_receiver.jsonl` | Receiver GPS positions (external receiver connected to the Jetson via USB) | JSON Lines, 0.8 Hz |
 | `gps_phone.jsonl` | OwnTracks smartphone positions, altitude, and speed | JSON Lines, 0.8 Hz |
 | `heading.jsonl` | Corrected head heading, degrees clockwise from North | JSON Lines, 13 Hz |
 | `imu.jsonl` | Head orientation: yaw, pitch, and roll in degrees | JSON Lines, 13 Hz |
