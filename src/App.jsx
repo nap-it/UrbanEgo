@@ -36,7 +36,7 @@ function Header() {
   return (
     <>
       <header className="site-header">
-        <div className="banner" style={{ backgroundImage: `url(${asset('banner2.jpg')})` }}>
+        <div className="banner" style={{ backgroundImage: `url(${asset('banner.jpg')})` }}>
           <div className="banner-inner">
             <Link to="/" className="brand">
               <h1>UrbanEgo Dataset</h1>
