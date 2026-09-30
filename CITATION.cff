@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "Please cite both the UrbanEgo dataset described here and the accompanying paper listed in references."
+type: dataset
+title: "UrbanEgo: A Multimodal First-Person Urban Perception Dataset"
+authors:
+  - family-names: Rodrigo
+    given-names: Abreu
+  - family-names: Clérigo
+    given-names: André
+  - family-names: Silva
+    given-names: Gonçalo Lourenço
+  - family-names: Rito
+    given-names: Pedro
+  - family-names: Sargento
+    given-names: Susana
+version: "1.0"
+date-released: "2026-09-30"
+doi: 10.5281/zenodo.23062929
+url: "https://doi.org/10.5281/zenodo.23062929"
+license: CC-BY-4.0
+references:
+  - type: article
+    title: "UrbanEgo: A Multimodal First-Person Urban Perception Dataset"
+    authors:
+      - family-names: Abreu
+        given-names: Rodrigo
+      - family-names: Clérigo
+        given-names: André
+      - family-names: Silva
+        given-names: Gonçalo
+      - family-names: Rito
+        given-names: Pedro
+      - family-names: Sargento
+        given-names: Susana
+    notes: "Publication metadata is pending. See README.md for the citation template; journal, publication year and DOI remain unspecified."

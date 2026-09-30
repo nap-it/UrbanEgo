@@ -4,6 +4,37 @@
 
 The collection consists of **eight runs**, approximately **2 h of recording sessions** and **8 GB** of data. The data were collected in **Aveiro, Portugal**, between May and July 2026. All runs were recorded by one researcher during daytime and fair weather.
 
+## Citations
+
+Please cite both the accompanying paper and the [Zenodo dataset record](https://doi.org/10.5281/zenodo.23062929) when using UrbanEgo. Machine-readable citation metadata for both is available in [CITATION.cff](CITATION.cff).
+
+### Paper
+
+```bibtex
+@article{urbanego_paper,
+  title   = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
+  author  = {Abreu, Rodrigo and Clérigo, André and Silva, Gonçalo and Rito, Pedro and Sargento, Susana},
+  journal = {[JOURNAL]},
+  year    = {[PUBLICATION_YEAR]},
+  doi     = {[PAPER_DOI]}
+}
+```
+
+### Dataset (Zenodo)
+
+```bibtex
+@dataset{rodrigo_2026_23062929,
+  author    = {Rodrigo, Abreu and Clérigo, André and Silva, Gonçalo Lourenço and Rito, Pedro and Sargento, Susana},
+  title     = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
+  month     = sep,
+  year      = 2026,
+  publisher = {Zenodo},
+  version   = {1.0},
+  doi       = {10.5281/zenodo.23062929},
+  url       = {https://doi.org/10.5281/zenodo.23062929}
+}
+```
+
 ![UrbanEgo acquisition setup and recorded modalities](public/figures/Demo.png)
 
 [Watch the acquisition and data-collection demo on YouTube](https://youtu.be/-RTJkzZOtU8).
@@ -85,36 +116,11 @@ Per-frame density measures detector output independently of tracking identities.
 - **Calibration and coordinates:** pose and calibration matrices refer to local HoloLens tracking/sensor frames, not WGS-84 coordinates. Confirm the coordinate convention, matrix multiplication order, and transform direction before projecting points between camera, rig, and world frames.
 - **Image representation:** depth and infrared images are stored as lossless 16-bit PNG files; lossless PNG storage does not by itself establish bit-exact equality with the original sensor stream.
 
-## Citations
+## Authors and Contact
 
-Please cite both the accompanying paper and the Zenodo dataset record when using UrbanEgo.
+UrbanEgo is part of ongoing research work at [Instituto de Telecomunicações' Network Architectures and Protocols Group](https://www.it.pt/Groups/Index/36).
 
-### Paper
-
-```bibtex
-@article{urbanego_paper,
-  title   = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
-  author  = {Abreu, Rodrigo and Clérigo, André and Silva, Gonçalo and Rito, Pedro and Sargento, Susana},
-  journal = {[JOURNAL]},
-  year    = {[PUBLICATION_YEAR]},
-  doi     = {[PAPER_DOI]}
-}
-```
-
-### Dataset (Zenodo)
-
-```bibtex
-@dataset{rodrigo_2026_23062929,
-  author    = {Rodrigo, Abreu and Clérigo, André and Silva, Gonçalo Lourenço and Rito, Pedro and Sargento, Susana},
-  title     = {UrbanEgo: A Multimodal First-Person Urban Perception Dataset},
-  month     = sep,
-  year      = 2026,
-  publisher = {Zenodo},
-  version   = {1.0},
-  doi       = {10.5281/zenodo.23062929},
-  url       = {https://doi.org/10.5281/zenodo.23062929}
-}
-```
+Questions and bug reports: [rodrigo.abreu@ua.pt](mailto:rodrigo.abreu@ua.pt) / [andreclerigo@ua.pt](mailto:andreclerigo@ua.pt)
 
 ## License
 
