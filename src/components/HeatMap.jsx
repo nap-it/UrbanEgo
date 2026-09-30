@@ -48,9 +48,11 @@ export default function HeatMap({ run, heat }) {
       <div className="panel-body">
         <div className="leaflet-holder"><div className="map" ref={mapDiv} style={{ minHeight: 380 }} /></div>
         <div className="notice">
-          Intensity is the mean per-frame count of {cls === 'ped' ? 'pedestrians' : 'vehicles'} the
-          wearer observed while at each ~{heat?.bin_m ?? 11} m location (ego position, from YOLO
-          detections), a proxy for how busy each area was, not the objects' own positions.
+          Colour intensity represents relative mean detector counts of {cls === 'ped' ? 'pedestrians' : 'vehicles'}
+          {' '}at the wearer's GPS positions, grouped into ~{heat?.bin_m ?? 11} m bins.
+          Each class is normalized within this run, so colours cannot be used to compare absolute
+          counts across runs or classes. The map locates the wearer during observations;
+          object locations are not included. Detection errors and GPS outliers affect the result.
         </div>
       </div>
     </div>

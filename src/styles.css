@@ -101,18 +101,15 @@ img { max-width: 100%; }
 .figrow figcaption b { color: var(--ink); }
 @media (max-width: 640px) { .figrow .imgs { grid-template-columns: 1fr; } }
 
-/* demo section: wide setup figure + video placeholder */
+/* demo section: wide setup figure + embedded video */
 .demo-fig { margin: 6px 0 24px; }
 .demo-fig img { width: 100%; height: auto; display: block; border: 1px solid var(--line); background: var(--box); }
 .demo-fig figcaption { font-size: 13px; color: var(--ink-soft); margin-top: 8px; }
 .demo-fig figcaption b { color: var(--ink); }
-.video-wip {
-  display: flex; align-items: center; justify-content: center; text-align: center;
-  aspect-ratio: 16 / 9; width: 100%; margin: 6px 0 14px;
-  background: var(--warn-bg); border: 1px dashed var(--warn-line); color: var(--ink-soft);
+.demo-video {
+  display: block; aspect-ratio: 16 / 9; width: 100%; margin: 6px 0 14px;
+  border: 0; background: var(--box);
 }
-.video-wip .vw-title { font-weight: 700; color: var(--ink); font-size: 16px; }
-.video-wip .vw-sub { font-size: 14px; color: var(--muted); margin-top: 4px; }
 
 /* citation / code block */
 .cite { background: var(--box); border: 1px solid var(--line); padding: 12px 14px; font-family: var(--mono); font-size: 13px; white-space: pre-wrap; overflow-x: auto; margin: 8px 0 16px; }

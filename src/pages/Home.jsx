@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import RunsTable from '../components/RunsTable.jsx'
-import { fetchJSON, figureURL, LINKS, fmtDuration } from '../lib/data.js'
+import { fetchJSON, figureURL, LINKS, CITATIONS, fmtDuration } from '../lib/data.js'
 
 export default function Home() {
   const [summary, setSummary] = useState(null)
@@ -24,11 +24,11 @@ export default function Home() {
 
       <section id="overview" className="anchor">
         <p className="lead-p">
-          The <b>UrbanEgo dataset</b> is a first-person (egocentric) recording of urban pedestrian
-          routes captured with a wearable Microsoft HoloLens&nbsp;2. Each run bundles synchronized
-          RGB video with audio, time-of-flight depth, and two independent GPS sources, together
-          with the wearer's head orientation. It is intended for research on vulnerable-road-user
-          (VRU) safety, egocentric perception, outdoor localization, and multimodal sensing.
+          The <b>UrbanEgo dataset</b> records urban environments from the viewpoint of a walking
+          pedestrian wearing a Microsoft HoloLens&nbsp;2 and a backpack with an NVIDIA Jetson edge
+          computer. Each run combines RGB video with stereo audio, long-throw depth and infrared
+          frames, head pose and heading, orientation angles, and two independent GPS sources.
+          An offline detection and tracking layer accompanies the sensor recordings.
         </p>
 
         <figure className="demo-fig">
@@ -42,12 +42,17 @@ export default function Home() {
         </figure>
 
         <p>
-          The dataset was collected through the Aveiro Tech City Living Lab. It comprises
+          Collected in Aveiro, Portugal, the dataset comprises
           {summary ? ` ${summary.n_runs}` : ' 8'} runs recorded across the city
-          of Aveiro, Portugal ({summary ? fmtDuration(summary.total_duration_s) : '~2 h'} of footage,
-          {summary ? ` ${(summary.total_distance_m / 1000).toFixed(1)} km walked` : ''},
-          {summary ? ` ${summary.total_size_gb} GB` : ' ~7.8 GB'} in standard open formats). Every
-          recording is also accompanied by an offline object-detection layer for road-user analysis.
+          between May and July&nbsp;2026: approximately
+          {summary ? ` ${fmtDuration(summary.total_duration_s)}` : ' 2 h 14 min'} of recordings and
+          {summary ? ` ${summary.total_size_gb} GB` : ' 7.8 GB'} in standard formats.
+          The routes cover the University of Aveiro campus, the Rua da Pêga lakeside arterial,
+          and the touristic city centre. One researcher recorded all runs during daytime and fair weather.
+        </p>
+        <p>
+          The released RGB video is processed with automatic face and vehicle licence-plate blurring.
+          This pass can miss identifiable content; residual identifiable content may remain.
         </p>
 
         <figure className="demo-fig">
@@ -55,26 +60,45 @@ export default function Home() {
           <figcaption>
             <b>Figure 2.</b> One synchronized instant from Run&nbsp;2 (Rua da Pêga): the egocentric
             RGB frame, the corresponding long-throw depth frame, and the wearer's position and
-            heading on the route. All streams share a single wall-clock timeline, so any moment can
-            be reconstructed across modalities.
+            heading on the route. Shared wall-clock timestamps support alignment across modalities
+            where their recording periods overlap.
           </figcaption>
         </figure>
 
+        <h3>Research uses</h3>
+        <ul>
+          <li>Pedestrian-view object detection, 3D scene understanding, and depth completion.</li>
+          <li>Outdoor localization, route analysis, and map matching with GPS and head orientation.</li>
+          <li>Wearable sensing and augmented reality for pedestrian safety.</li>
+          <li>Exploring how pedestrian observations can contribute to cooperative perception.</li>
+        </ul>
         <div className="btn-row">
-          <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Download the dataset</a>
-          <a className="btn" href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a>
+          {LINKS.dataset && <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Download the dataset</a>}
+          {LINKS.paper && <a className="btn" href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a>}
+          <Link className="btn" to="/" state={{ scrollTo: 'cite' }}>About the paper</Link>
         </div>
       </section>
 
       <section id="demo" className="anchor">
         <h2>Demo</h2>
-        <div className="video-wip" role="img" aria-label="UrbanEgo demo video placeholder">
-          <div className="vw-title">UrbanEgo demo</div>
-        </div>
+        <iframe
+          className="demo-video"
+          src="https://www.youtube-nocookie.com/embed/-RTJkzZOtU8"
+          title="UrbanEgo dataset demo"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerPolicy="strict-origin-when-cross-origin"
+          allowFullScreen
+        />
+        <p><a href={LINKS.demo} target="_blank" rel="noreferrer">Open the demo on YouTube</a></p>
       </section>
 
       <section id="data" className="anchor">
         <h2>Data included</h2>
+        <p>
+          The sensing platform combines internal perception (head orientation), external perception
+          (RGB, depth, infrared, and audio), and localization (hardware GPS and smartphone GPS).
+        </p>
         <p>
           The dataset is organized into one top-level folder per run, named
           <span className="mono"> runN_YYYYMMDD_HHMMSS</span> (where <span className="mono">N</span> is
@@ -95,9 +119,9 @@ export default function Home() {
               <tr><td className="mono">calibration/</td><td>Depth intrinsics/extrinsics + per-pixel unit-ray table</td><td>JSON + CSV</td><td>per run</td></tr>
               <tr><td className="mono">gps_vam.jsonl</td><td>Hardware GPS receiver (on the Jetson)</td><td>JSON Lines</td><td>~0.8 Hz</td></tr>
               <tr><td className="mono">gps_phone.jsonl</td><td>Phone GPS (OwnTracks)</td><td>JSON Lines</td><td>~0.8 Hz</td></tr>
-              <tr><td className="mono">heading.jsonl</td><td>Head heading (degrees from North)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
+              <tr><td className="mono">heading.jsonl</td><td>Corrected head heading (degrees clockwise from North)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
               <tr><td className="mono">imu.jsonl</td><td>Head orientation (yaw, pitch, roll)</td><td>JSON Lines</td><td>~13 Hz</td></tr>
-              <tr><td className="mono">yolo/</td><td>Offline object detections (see below)</td><td>JSON Lines + JSON</td><td>per run</td></tr>
+              <tr><td className="mono">yolo/</td><td>Offline object detections (see below)</td><td>JSON Lines + JSON</td><td>per RGB frame</td></tr>
               <tr><td className="mono">manifest.json</td><td>Run summary: identifiers, per-stream counts, layout</td><td>JSON</td><td>per run</td></tr>
             </tbody>
           </table>
@@ -105,11 +129,11 @@ export default function Home() {
 
         <h3>One shared clock</h3>
         <p>
-          Every record in every <span className="mono">.jsonl</span> file (one JSON object per line)
-          carries the same wall-clock timestamp, so any instant can be reconstructed across
-          modalities without an external sync signal. To find the depth frame, GPS fix, or heading
-          for a given video moment, match the nearest <span className="mono">ts_unix_ns</span>. These
-          fields are common to every stream:
+          Sensor JSON Lines records (one JSON object per line) use a shared wall-clock timestamp
+          convention. To associate an RGB frame with depth, GPS, or heading samples, use the frame's
+          timestamp in <span className="mono">rgb_frames.jsonl</span> and match the nearest
+          <span className="mono"> ts_unix_ns</span> in the other sensor stream. Sensor records
+          include these fields:
         </p>
         <div className="table-scroll">
           <table className="dtable">
@@ -122,20 +146,34 @@ export default function Home() {
           </table>
         </div>
         <p className="muted">
-          The per-stream files add their own fields on top of these (for example
-          <span className="mono"> rgb_frames.jsonl</span> adds the head pose and camera intrinsics),
-          and <span className="mono">rgb.mp4</span> plays in real time so a moment at video time
-          <span className="mono"> t</span> is the instant <span className="mono">t</span> seconds after
-          the run started, as demonstrated in the synchronized viewer on each run's page.
+          Video playback time and session time can have different starting points. Use the frame
+          metadata for alignment rather than assuming every stream starts at video time zero.
+          Streams can also end at different times. The detection files use frame indices and
+          <span className="mono"> ts_ns</span> for association with RGB metadata.
+        </p>
+        <h3>Working with depth and GPS</h3>
+        <p>
+          Depth pixels store distances in millimetres; zero means no measurement. The accompanying
+          infrared image shares the depth grid. The per-pixel ray table in
+          <span className="mono"> calibration/</span> supports reconstruction of nearby 3D points
+          from the rectified depth frames. The depth sensor covers only a few metres.
+        </p>
+        <p>
+          The hardware receiver's altitude is an unavailable-value sentinel and should be ignored.
+          Discard out-of-range latitude or longitude values while it acquires a fix, and filter GPS
+          jumps that imply implausible walking speeds. The released heading values include a
+          correction for a constant angular offset in each run.
         </p>
       </section>
 
       <section id="detections" className="anchor">
         <h2>Object-detection layer</h2>
         <p>
-          Alongside the raw streams, each run ships an offline object-detection layer derived from the
-          RGB video with a YOLO11x detector and a BoT-SORT tracker (appearance re-identification),
-          grouped into <b>pedestrians</b>, <b>bicycles</b>, and <b>vehicles</b>. It is stored per run
+          Each run includes an offline object-detection layer computed from the recorded RGB camera
+          stream with YOLO11x and BoT-SORT with appearance re-identification. Classes are grouped
+          into <b>pedestrians</b>, <b>bicycles</b>, and <b>vehicles</b> (cars, motorcycles, buses, and
+          trucks). These automatic outputs have not been human-verified and can contain detection
+          and tracking errors. They are stored per run
           as two line-delimited JSON files plus a metadata file:
         </p>
         <div className="table-scroll">
@@ -149,10 +187,27 @@ export default function Home() {
           </table>
         </div>
         <p>
-          Detections are in image space (pixel bounding boxes). Per-frame density (how many objects
-          are in view) is the reliable, tracking-free metric; unique object counts and flow rates are
-          tracking-based estimates. The per-run pages show an observation-density heatmap built from
-          this layer.
+          Detections are pixel bounding boxes, with no world-referenced object positions.
+          Per-frame density measures detector output independently of track identities and remains
+          subject to detection errors. Unique-object counts and flow rates are upper-bound estimates:
+          fragmented tracks and repeated observations can inflate them. The per-run heatmaps place
+          observations at the wearer's GPS location and show relative density within each run.
+        </p>
+        <figure className="demo-fig">
+          <img src={figureURL('fig_mean_density.png')} loading="lazy" alt="Mean detected objects per frame in all eight runs: vehicles dominate Runs 3, 4, and 6; pedestrians are most prevalent in Runs 7 and 8; bicycles are uncommon throughout" />
+          <figcaption>
+            <b>Figure 3.</b> Mean detected objects per frame by run and class, as reported in the
+            paper. Averaging over frames allows comparisons between runs of different lengths;
+            these counts describe automatic detector output.
+          </figcaption>
+        </figure>
+        <h3>Pedestrian contributions to collective perception</h3>
+        <p>
+          GPS, heading, phone speed, and tracked detections provide ingredients for experiments
+          with Collective Perception Messages (CPMs). Generating object positions and velocities
+          requires additional processing, including alignment of camera pose and depth for nearby
+          objects. Objects beyond the depth range need further estimation. The dataset contains
+          sensor recordings and detections; CPMs and world-referenced object positions are not included.
         </p>
       </section>
 
@@ -163,34 +218,69 @@ export default function Home() {
           spanning campus, arterial, and city-centre settings. Select a run to open its synchronized
           RGB / depth / map viewer and its density heatmap.
         </p>
+        <p>
+          For pedestrian-rich scenes, start with Rossio and Praça do Peixe (Runs&nbsp;7 and&nbsp;8).
+          For vehicle-rich scenes, choose Runs&nbsp;6, 4, and&nbsp;3. Run&nbsp;1 combines moderate
+          pedestrian and vehicle traffic with the highest cycling activity. Runs&nbsp;2 and&nbsp;4
+          repeat the lakeside route; Runs&nbsp;3 and&nbsp;5 repeat the campus and hospital route.
+        </p>
         {runs.length ? <RunsTable runs={runs} /> : <div className="loading">Loading runs…</div>}
+        <p className="muted">
+          Route thumbnails and distances are derived from GPS tracks. Distances are estimates
+          affected by GPS accuracy. Each run page provides a short synchronized preview of the
+          RGB / depth / map streams.
+        </p>
+      </section>
+
+      <section id="limitations" className="anchor">
+        <h2>Limitations</h2>
+        <ul>
+          <li><b>Collection scope.</b> Eight walks by one wearer in one city, during daytime and
+            fair weather. Night-time, adverse weather, and systematically varied pedestrian
+            behaviour are outside this collection.</li>
+          <li><b>Automatic labels.</b> Detections are an automatic baseline, not human-verified
+            ground truth. Small, distant, and occluded road users may be missed.</li>
+          <li><b>Depth coverage.</b> Short-range, 320×288 depth at approximately 5 fps supports
+            nearby scene structure but cannot locate most street objects.</li>
+          <li><b>GPS coverage and accuracy.</b> The hardware receiver starts 45–70 seconds late
+            in two early runs. The phone track can bridge those gaps, but both sources can have
+            outliers; the phone track in Run&nbsp;3 is particularly affected. Stream end times
+            also vary.</li>
+          <li><b>Privacy.</b> Automatic face and licence-plate blurring may leave identifiable
+            content in the released RGB video.</li>
+        </ul>
       </section>
 
       <section id="download" className="anchor">
         <h2>Download</h2>
         <div className="callout">
           <p>
-            The full dataset (standard-format files: MP4, PNG, JSON&nbsp;Lines, and CSV, for all runs)
-            will be published with a permanent DOI. A download link will appear here once released.
+            The full dataset comprises all eight runs in MP4, PNG, JSON&nbsp;Lines, and CSV.
+            The Zenodo record URL, DOI, and access instructions will be added when available.
+            The clips on this website are
+            short previews of the recordings.
           </p>
-          <div className="btn-row">
+          {LINKS.dataset && <div className="btn-row">
             <a className="btn primary" href={LINKS.dataset} target="_blank" rel="noreferrer">Dataset repository</a>
-          </div>
+          </div>}
         </div>
       </section>
 
       <section id="cite" className="anchor">
-        <h2>Citation &amp; license</h2>
-        <p>If you use this dataset, please cite the accompanying article:</p>
-        <div className="cite">{`@article{urbanego_dataset,
-  title   = {UrbanEgo: A Multimodal First-Person Urban
-             Perception Dataset},
-  author  = {Abreu, Rodrigo and Clérigo, André and Silva, Gonçalo
-             and Rito, Pedro and Sargento, Susana},
-  journal = {Data in Brief [to appear]},
-  year    = {2026}
-}`}</div>
-        <p className="muted">Released under a Creative Commons license (to be confirmed on publication).</p>
+        <h2>Citations</h2>
+        <h3>Paper citation</h3>
+        <p><b>UrbanEgo: A Multimodal First-Person Urban Perception Dataset</b></p>
+        {LINKS.paper && <p><a href={LINKS.paper} target="_blank" rel="noreferrer">Read the paper</a></p>}
+        <pre className="cite" aria-label="Paper citation placeholder">{CITATIONS.paper}</pre>
+        <h3>Dataset citation (Zenodo)</h3>
+        <pre className="cite" aria-label="Zenodo dataset citation placeholder">{CITATIONS.dataset}</pre>
+        <h3>License</h3>
+        <p>
+          The UrbanEgo dataset and this website are licensed under the
+          {' '}<a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noreferrer">
+            GNU General Public License v3.0 (GPL-3.0)
+          </a>.
+        </p>
       </section>
 
     </div>

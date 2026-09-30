@@ -11,7 +11,7 @@ export default function RunsTable({ runs }) {
         <thead>
           <tr>
             <th>Route</th><th>Run</th><th>Zone</th><th>Date</th>
-            <th className="num">Duration</th><th className="num">Distance</th><th></th>
+            <th className="num">Duration</th><th className="num">GPS distance estimate</th><th></th>
           </tr>
         </thead>
         <tbody>

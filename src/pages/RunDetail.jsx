@@ -40,8 +40,8 @@ export default function RunDetail() {
       <div className="detail-meta">
         <div className="m"><span className="k">Date</span><span className="v">{run.date}</span></div>
         <div className="m"><span className="k">Duration</span><span className="v">{fmtDuration(run.duration)}</span></div>
-        <div className="m"><span className="k">Distance</span><span className="v">{fmtDistance(run.distance_m)}</span></div>
-        <div className="m"><span className="k">GPS points</span><span className="v">{run.vam.length + run.phone.length}</span></div>
+        <div className="m"><span className="k">GPS distance estimate</span><span className="v">{fmtDistance(run.distance_m)}</span></div>
+        <div className="m"><span className="k">GPS samples (VAM + phone)</span><span className="v">{run.vam.length + run.phone.length}</span></div>
         <div className="m"><span className="k">Heading samples</span><span className="v">{run.hdg.length}</span></div>
       </div>
 

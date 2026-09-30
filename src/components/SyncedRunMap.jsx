@@ -165,8 +165,9 @@ export default function SyncedRunMap({ run }) {
             </button>}
         </div>
         <div className="notice">
-          The map marker and heading arrow are sampled at the clip's playback time
-          (a ~20 s segment of the full route, highlighted in pink).
+          This synchronized preview covers a ~20 s segment of the full route, highlighted in pink.
+          The marker uses the selected GPS source; the arrow uses the head-heading stream.
+          GPS coverage and accuracy vary between sources and runs.
         </div>
       </div>
     </div>
