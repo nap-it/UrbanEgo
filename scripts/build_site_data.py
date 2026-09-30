@@ -188,7 +188,8 @@ def make_clip(src_mp4, out_mp4, ss, dur, height=480, fps=15):
     out_mp4.parent.mkdir(parents=True, exist_ok=True)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{ss:.2f}", "-i", str(src_mp4),
            "-t", f"{dur:.2f}", "-vf", f"scale=-2:{height}", "-r", str(fps), "-an",
-           "-c:v", "libx264", "-crf", "30", "-preset", "veryfast",
+           "-c:v", "libx264", "-pix_fmt", "yuv420p", "-profile:v", "high",
+           "-crf", "30", "-preset", "veryfast",
            "-movflags", "+faststart", str(out_mp4)]
     subprocess.run(cmd, check=True)
     return out_mp4.stat().st_size
